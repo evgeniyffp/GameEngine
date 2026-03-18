@@ -92,14 +92,15 @@ void Game::initModels() {
 	world.emplace_back(
 		vec3(0.0f, 0.0f, -3.0f),
 		materials[0],
-        "./Files/Objects/BigCity.obj",
+        "./Files/Objects/Monkey.obj",
         textures[0]
     );
 
     animation_manager.emplace<MoveAnimation>(
-        lights[0],
-        10.f,
-        vec3(-1000, -1000, -1000)
+        world[0],
+        5.f,
+        std::make_unique<PowerEasing<1>>(),
+        vec3(-10, 0, 0)
     );
 }
 

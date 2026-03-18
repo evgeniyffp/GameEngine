@@ -7,12 +7,11 @@ private:
     vec3 final_position;
 
 public:
-    MoveAnimation(Transformable& target, float duration, vec3 final_position)
-        : Animation(target, duration), final_position(final_position) {}
-    
-    float duration;
-    float elapsed = 0.0f;
- 
+    MoveAnimation(Transformable& target, float duration, std::unique_ptr<Easing> easing, vec3 final_position)
+        : Animation(target, duration, std::move(easing)), final_position(final_position) {}
+
+    ~MoveAnimation() override = default;
+
     void apply(float delta_percentage) {
         target.move(delta_percentage * final_position);
     }

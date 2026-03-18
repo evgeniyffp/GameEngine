@@ -1,25 +1,29 @@
 #pragma once
 
+#include <memory>
+
+#include <Engine/Graphics/Transformable/Transformable.h>
+#include <Engine/Easing/Easing.h>
+
 class Animation {
 protected:
     Transformable& target;
     float duration;
     float elapsed = 0.0f;
     bool finished = false;
+    std::unique_ptr<Easing> easing;
 
 public:
-    Animation(Transformable& target, float duration)
-        : target(target), duration(duration) {}
+    Animation(Transformable& target, float duration, std::unique_ptr<Easing> easing)
+        : target(target), duration(duration), easing(std::move(easing)) {}
     
     virtual ~Animation() = default;
 
-    // TODO добавить easing-функции: квадратичная, синусоидная, кривую Безье
-    // сейчас используется линейная
     void update(float dt) {
         if (finished)
             return;
 
-        float old_elapsed = elapsed;
+        float old_progres = elapsed / duration;
 
         elapsed += dt;
 
@@ -27,8 +31,12 @@ public:
             elapsed = duration;
             finished = true;
         }
+        
+        float new_progres = elapsed / duration;
 
-        apply((elapsed - old_elapsed) / duration);
+        float delta_percentage = easing->ease(new_progres) - easing->ease(old_progres);
+
+        apply(delta_percentage);
     }
 
     virtual void apply(float delta_percentage) = 0;
