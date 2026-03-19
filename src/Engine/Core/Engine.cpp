@@ -1,7 +1,5 @@
 #include "Engine.h"
 
-#include <Engine/Events/Events.h>
-#include <Engine/Events/Keyboard.h>
 #include <Engine/Utilities/Setting/Setting.h>
 
 #include <utils/displayInfo.h>
@@ -44,12 +42,9 @@ Engine::Engine(std::string title)
 	GLSetting::Version::set(4, 5);
 	
 	window.init();
-    mouse_control.setWindow(window.get());
 
     initGLAD();
 }
-
-Engine::~Engine() = default;
 
 void Engine::render() {
 	glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
@@ -57,14 +52,10 @@ void Engine::render() {
 	
 	world.render(shaders[Shader_Core_Program]);
 
-	shaders[Shader_Core_Program].use();
-
 	glfwSwapBuffers(window.get());
 	glFlush();
 
 	glBindVertexArray(0);
-
-	shaders[Shader_Core_Program].unUse();
 
 	glActiveTexture(0);
 	glBindTexture(GL_TEXTURE_2D, 0);

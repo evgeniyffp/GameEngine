@@ -13,24 +13,21 @@ find_package(spdlog          REQUIRED)
 add_executable(${PROJECT_NAME} 
  src/main.cpp
  src/Game/Game.cpp
- 
+
  src/utils/displayInfo.cpp
  src/utils/File.cpp 
- 
+
  src/Time/Time.cpp
  src/Time/TimeFromLastFrame.cpp
- 
- src/Engine/Core/Window.cpp   
+
+ src/Engine/Core/Window/Window.cpp   
  src/Engine/Core/Engine.cpp
 
- src/Engine/Events/Events.cpp 
- src/Engine/Events/Keyboard.cpp 
- 
  src/Engine/Wordl/Wordl.cpp
- 
+
  src/Engine/Utilities/ObjLoader/ObjLoader.cpp                
  src/Engine/Utilities/ProjectionMatrix/ProjectionMatrix.cpp  
- 
+
  src/Engine/Graphics/Camera/Camera.cpp                         
  src/Engine/Graphics/Mesh/Mesh.cpp                            
  src/Engine/Graphics/Shader/Shader.cpp

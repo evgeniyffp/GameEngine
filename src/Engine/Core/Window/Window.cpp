@@ -1,8 +1,5 @@
 #include "./Window.h"
 
-#include <Engine/Events/Events.h>
-#include <Engine/Events/Keyboard.h>
-
 #include <utils/displayInfo.h>
 
 void framebuffer_resize_callback(GLFWwindow* window, int width, int height) {
@@ -52,6 +49,9 @@ void Window::initWindow() {
 	glfwGetFramebufferSize(window, &size.x, &size.y);
 	
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    keyboard_control.setWindow(window);
+    mouse_control.setWindow(window);
 }
 
 Window::Window(std::string _title) : title(std::move(_title)) {}
@@ -69,6 +69,14 @@ ivec2& Window::get_size_ref() {
     return size;
 }
 
+KeyboardControl& Window::getKeyboardControl() {
+    return keyboard_control;
+}
+
+MouseControl& Window::getMouseControl() {
+    return mouse_control;
+}
+
 void Window::close() {
     glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
@@ -83,6 +91,7 @@ void Window::init() {
 }
 
 void Window::update() {
-	Core::Events::update(window);
+	glfwPollEvents();
+	keyboard_control.update();
 }
 

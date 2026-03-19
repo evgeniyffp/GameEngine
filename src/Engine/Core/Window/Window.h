@@ -9,11 +9,17 @@ using namespace glm;
 #include <Engine/Utilities/Setting/Setting.h> // need for .cpp
 #include <GLFW/glfw3.h>
 
+#include "./KeyboardControl.h"
+#include "./MouseControl.h"
+
 class Window {
 private:
 	GLFWwindow* window;
 	ivec2 size;
 	std::string title;
+
+    KeyboardControl keyboard_control;
+    MouseControl mouse_control;
 
     void initGLFW();
     void initWindow();
@@ -25,6 +31,9 @@ public:
     GLFWwindow* get();
 
     ivec2& get_size_ref();
+
+    KeyboardControl& getKeyboardControl();
+    MouseControl& getMouseControl();
 
     bool is_closed();
     void close();

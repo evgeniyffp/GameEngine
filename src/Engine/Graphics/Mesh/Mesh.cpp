@@ -13,11 +13,11 @@ void Mesh::initVAO() {
 		vertexArray.size() * sizeof(Vertex), vertexArray.data(),
 		GL_STATIC_DRAW);
 
-	if (countIndices != 0) {
+	if (indexArray.size() != 0) {
 		glGenBuffers(1, &EBO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-			countIndices * sizeof(GLuint), indexArray,
+			indexArray.size() * sizeof(GLuint), indexArray.data(),
 			GL_STATIC_DRAW);
 	}
 
@@ -43,14 +43,10 @@ void Mesh::uniformsUpdate(const Shader& shader) const {
 // be carefull with args (starts with _) and don't confuse them with the variables in the class itself
 Mesh::Mesh(
 	std::vector<Vertex> _vertexArray,
-	GLuint* _indexArray, const GLuint& _countIndices, 
+	std::vector<GLuint> _indexArray,
 	vec3 _position, vec3 _origin, vec3 _rotation, vec3 _scale
-)       : vertexArray(std::move(_vertexArray)), position(_position), origin(_origin), rotation(_rotation), scale(_scale)
-        ,  countIndices(_countIndices) {
-	indexArray = new GLuint[countIndices];
-	for (GLuint i = 0; i < countIndices; ++i)
-		indexArray[i] = _indexArray[i];
-
+)       : vertexArray(std::move(_vertexArray)), indexArray(std::move(_indexArray)),
+        position(_position), origin(_origin), rotation(_rotation), scale(_scale) {
 	initVAO();
 	update();
 }
@@ -71,18 +67,15 @@ Mesh::Mesh(
 */
 
 Mesh::Mesh(const Mesh& object) : Mesh(
-	object.vertexArray,
-	object.indexArray, object.countIndices,
+	object.vertexArray, object.indexArray,
 	object.position, object.origin, object.rotation, object.scale
 ) {}
 
 Mesh::~Mesh() {
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
-	if (countIndices != 0)
+	if (indexArray.size() != 0)
 		glDeleteBuffers(1, &EBO);
-
-	delete[] indexArray;
 }
 
 vec3 Mesh::getPosition() const {
@@ -132,10 +125,10 @@ void Mesh::render(const Shader& shader) const {
 	shader.use();
 
 	glBindVertexArray(VAO);
-	if (countIndices == 0)
+	if (indexArray.size() == 0)
 		glDrawArrays(GL_TRIANGLES, 0, vertexArray.size());
 	else
-		glDrawElements(GL_TRIANGLES, countIndices, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, indexArray.size(), GL_UNSIGNED_INT, 0);
 
 	glBindVertexArray(0);
 

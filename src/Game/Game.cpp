@@ -2,13 +2,10 @@
 
 #include <Time/Time.h>
 
-#include <Engine/Events/Events.h>
-#include <Engine/Events/Keyboard.h>
-
 #include <utils/displayInfo.h>
 
 void Game::updateCameras() {
-	if (Core::Events::Keyboard::isPressedN()) 
+	if (window.getKeyboardControl().isPressedN()) 
 		++selectedCamera;
 	if (selectedCamera >= cameras.size())
         selectedCamera = 0;
@@ -29,19 +26,19 @@ void Game::updateUniforms() {
 }
 
 void Game::updateKeyboardInput() {
-	if (Core::Events::Keyboard::isPressedMovementW())
+	if (window.getKeyboardControl().isPressedMovementW())
 		cameras[selectedCamera].move_in_direction(Direction::Forward);
-	if (Core::Events::Keyboard::isPressedMovementS())
+	if (window.getKeyboardControl().isPressedMovementS())
 		cameras[selectedCamera].move_in_direction(Direction::Backward);
 
-	if (Core::Events::Keyboard::isPressedMovementD())
+	if (window.getKeyboardControl().isPressedMovementD())
 		cameras[selectedCamera].move_in_direction(Direction::Right);
-	if (Core::Events::Keyboard::isPressedMovementA())
+	if (window.getKeyboardControl().isPressedMovementA())
 		cameras[selectedCamera].move_in_direction(Direction::Left);
 
-	if (Core::Events::Keyboard::isPressedMovementLShift())
+	if (window.getKeyboardControl().isPressedMovementLShift())
 		cameras[selectedCamera].move_in_direction(Direction::Up);
-	if (Core::Events::Keyboard::isPressedMovementSpace())
+	if (window.getKeyboardControl().isPressedMovementSpace())
 		cameras[selectedCamera].move_in_direction(Direction::Down);
 
     vec3 rotation(0.0f);
@@ -51,10 +48,10 @@ void Game::updateKeyboardInput() {
 		rotation.y += 1.0f;
 	world[0].rotate(rotation);
 
-	if (Core::Events::Keyboard::isPressedB())
+	if (window.getKeyboardControl().isPressedB())
 		GLSetting::changeRenderMode();
 	
-    if (Core::Events::Keyboard::isPressedEcs())
+    if (window.getKeyboardControl().isPressedEcs())
         window.close();
 }
 
@@ -99,7 +96,7 @@ void Game::initModels() {
     animation_manager.emplace<MoveAnimation>(
         world[0],
         5.f,
-        std::make_unique<PowerEasing<1>>(),
+        std::make_unique<PowerEasing<10>>(),
         vec3(-10, 0, 0)
     );
 }
@@ -114,6 +111,8 @@ void Game::update() {
 	
 	if (glfwGetMouseButton(window.get(), GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
 		lights[0].setPosition(cameras[selectedCamera].getPosition());
+    
+    auto& mouse_control = window.getMouseControl();
     cameras[selectedCamera].update(mouse_control.getOffset());
 	mouse_control.update();
 	

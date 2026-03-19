@@ -19,8 +19,7 @@ class Mesh : public Transformable {
 private:
     std::vector<Vertex> vertexArray;
 
-	GLuint* indexArray;
-	GLuint countIndices;
+    std::vector<GLuint> indexArray;
 
 	GLuint VAO;
 	GLuint VBO;
@@ -39,8 +38,8 @@ private:
 public:
 	Mesh(
 		std::vector<Vertex> vertices,
-		GLuint* indices = 0, const GLuint& countIndices = 0,
-		vec3 position = vec3(0.0f), 
+		std::vector<GLuint> indices = {},
+        vec3 position = vec3(0.0f), 
 		vec3 origin = vec3(0.0f),
 		vec3 rotation = vec3(0.0f), 
 		vec3 scale = vec3(1.0f)

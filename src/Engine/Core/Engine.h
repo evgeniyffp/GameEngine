@@ -16,9 +16,7 @@ using namespace glm;
 
 #include <Time/TimeFromLastFrame.h>
 
-#include <Engine/MouseControl/MouseControl.h>
-
-#include "./Window.h"
+#include "./Window/Window.h"
 
 enum shaderEnum { Shader_Core_Program = 0 };
 
@@ -26,8 +24,6 @@ class Engine {
 protected:
     Window window;
 	
-    MouseControl mouse_control;
-
     bool isInitGLAD = false;
 	void initGLAD();
 
@@ -51,7 +47,7 @@ public:
 	void loop();
 	
 	Engine(std::string title);
-	~Engine();
+    ~Engine() = default;
 
 	virtual void update() = 0;
 	void render();
