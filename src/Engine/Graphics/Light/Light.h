@@ -3,9 +3,10 @@
 #include <glm/glm.hpp>
 using namespace glm;
 
-#include <Engine/Graphics/Transformable/Transformable.h>
+#include <Engine/Interfaces/Movable.h>
+#include <Engine/Interfaces/Colorable.h>
 
-class Light : public Transformable {
+class Light : public Movable, public Colorable {
 private:
 	float intensity;
 
@@ -33,10 +34,9 @@ public:
     vec3 getPosition() const override;
     void setPosition(const vec3& new_position) override;
     void move(const vec3& delta_position) override;
-    
-    // TODO
-    vec3 getRotation() const override;
-    void setRotation(const vec3& new_rotation) override;
-    void rotate(const vec3& delta_position) override;
+
+    glm::vec3 getColor() const override;
+    void setColor(const glm::vec3& new_color) override;
+    void doColor(const glm::vec3& delta_color) override;
 };
 

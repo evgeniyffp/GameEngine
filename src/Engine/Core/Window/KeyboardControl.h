@@ -1,116 +1,84 @@
 #pragma once
 
+#include <unordered_map>
+
 #include <GLFW/glfw3.h>
 
 class KeyboardControl {
 private:
+    inline static const std::unordered_map<std::string, const int> keymap{
+        { "A", GLFW_KEY_A },
+        { "B", GLFW_KEY_B },
+        { "C", GLFW_KEY_C },
+        { "D", GLFW_KEY_D },
+        { "E", GLFW_KEY_E },
+        { "G", GLFW_KEY_G },
+        { "H", GLFW_KEY_H },
+        { "I", GLFW_KEY_I },
+        { "J", GLFW_KEY_J },
+        { "K", GLFW_KEY_K },
+        { "L", GLFW_KEY_L },
+        { "M", GLFW_KEY_M },
+        { "N", GLFW_KEY_N },
+        { "O", GLFW_KEY_O },
+        { "P", GLFW_KEY_P },
+        { "Q", GLFW_KEY_Q },
+        { "R", GLFW_KEY_R },
+        { "S", GLFW_KEY_S },
+        { "T", GLFW_KEY_T },
+        { "U", GLFW_KEY_U },
+        { "V", GLFW_KEY_V },
+        { "W", GLFW_KEY_W },
+        { "X", GLFW_KEY_X },
+        { "Y", GLFW_KEY_Y },
+        { "Z", GLFW_KEY_Z },
+        { "F1", GLFW_KEY_F1 },
+        { "F2", GLFW_KEY_F2 },
+        { "F3", GLFW_KEY_F3 },
+        { "F4", GLFW_KEY_F4 },
+        { "F5", GLFW_KEY_F5 },
+        { "F6", GLFW_KEY_F6 },
+        { "F7", GLFW_KEY_F7 },
+        { "F8", GLFW_KEY_F8 },
+        { "F9", GLFW_KEY_F9 },
+        { "F10", GLFW_KEY_F10 },
+        { "F11", GLFW_KEY_F11 },
+        { "F12", GLFW_KEY_F12 },
+        { "LEFT_SHIFT", GLFW_KEY_LEFT_SHIFT },
+        { "RIGHT_SHIFT", GLFW_KEY_RIGHT_SHIFT },
+        { "ESC", GLFW_KEY_ESCAPE },
+        { "SPACE", GLFW_KEY_SPACE }
+    };
+
     GLFWwindow* window = nullptr;
 
 public:
     KeyboardControl() = default;
     
     void setWindow(GLFWwindow* new_window) {
+        isPressButton.clear();
+        wasPressButton.clear();
+
         window = new_window;
     }
 
     void update() {
-	    wasPressF11 = isPressF11;
-	    isPressF11 = glfwGetKey(window, GLFW_KEY_F11) == GLFW_PRESS;
-
-	    wasPressEcs = isPressEcs;
-	    isPressEcs = glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS;
-
-	    wasPressA = isPressA;
-	    isPressA = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
-
-	    wasPressW = isPressW;
-	    isPressW = glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS;
-
-	    wasPressS = isPressS;
-	    isPressS = glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS;
-
-	    wasPressD = isPressD;
-		isPressD = glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
-
-		wasPressB = isPressB;
-		isPressB = glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS;
-
-		wasPressN = isPressN;
-		isPressN = glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS;
-
-		wasPressLShift = isPressLShift;
-		isPressLShift = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
-
-		wasPressRShift = isPressRShift;
-		isPressRShift = glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS;
-
-		wasPressSpace = isPressSpace;
-		isPressSpace = glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS;
+        wasPressButton = isPressButton;
+        for (const auto& [keyname, key] : keymap) {
+	        isPressButton[keyname] = (glfwGetKey(window, key) == GLFW_PRESS);
+        }
 	}
 
-	bool isPressedF11() { return isPressF11 && !wasPressF11; }
+	bool isPressedOnce(const std::string& key) {
+        return isPressButton[key] && !wasPressButton[key];
+    }
 
-	bool isPressedEcs() { return isPressEcs && !wasPressEcs; }
-
-	bool isPressedA() { return isPressA && !wasPressA; }
-	bool isPressedMovementA() { return isPressA; }
-
-	bool isPressedW() { return isPressW && !wasPressW; }
-	bool isPressedMovementW() { return isPressW; }
-
-	bool isPressedS() { return isPressS && !wasPressS; }
-	bool isPressedMovementS() { return isPressS; }
-
-	bool isPressedD() { return isPressD && !wasPressD; }
-	bool isPressedMovementD() { return isPressD; }
-
-	bool isPressedB() { return isPressB && !wasPressB; }
-	bool isPressedMovementB() { return isPressB; }
-
-	bool isPressedN() { return isPressN && !wasPressN; }
-	bool isPressedMovementN() { return isPressN; }
-
-	bool isPressedLShift() { return isPressLShift && !wasPressLShift; }
-	bool isPressedMovementLShift() { return isPressLShift; }
-
-	bool isPressedRShift() { return isPressRShift && !wasPressRShift; }
-	bool isPressedMovementRShift() { return isPressRShift; }
-
-	bool isPressedSpace() { return isPressSpace && !wasPressSpace; }
-	bool isPressedMovementSpace() { return isPressSpace; }
+	bool isPressed(const std::string& key) {
+        return isPressButton[key];
+    }
 
 private:
-	bool isPressF11 = false;
-	bool wasPressF11 = false;
-
-	bool isPressEcs = false;
-	bool wasPressEcs = false;
-
-	bool isPressA = false;
-	bool wasPressA = false;
-
-	bool isPressW = false;
-	bool wasPressW = false;
-
-	bool isPressS = false;
-	bool wasPressS = false;
-
-	bool isPressD = false;
-	bool wasPressD = false;
-		
-	bool isPressB = false;
-	bool wasPressB = false;
-
-	bool isPressN = false;
-	bool wasPressN = false;
-
-	bool isPressLShift = false;
-	bool wasPressLShift = false;
-
-	bool isPressRShift = false;
-	bool wasPressRShift = false;
-
-	bool isPressSpace = false;
-	bool wasPressSpace = false;
+    std::unordered_map<std::string, bool> isPressButton;
+    std::unordered_map<std::string, bool> wasPressButton;
 };
 

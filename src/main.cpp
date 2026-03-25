@@ -2,13 +2,11 @@
 
 #include <utils/displayInfo.h>
 
-#include <iostream>
-
 int main() {
 	try {
 		Game game("Game Engine");
 	
-        // glfwSwapInterval(0); // remove VSycs
+        glfwSwapInterval(0); // remove VSycs
 
 		game.loop();
 	}

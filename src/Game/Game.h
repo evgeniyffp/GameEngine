@@ -18,6 +18,7 @@ private:
 
 public:
 	Game(std::string title);
+    ~Game() override = default;
 
 	void update() override;
 };

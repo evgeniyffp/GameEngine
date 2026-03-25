@@ -27,7 +27,11 @@ void Engine::initGLAD() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    //
 	glPolygonMode(GL_FRONT_AND_BACK, GLSetting::DefaultRenderMode);
+
+    //
+    glClearColor(0.0f, 1.0f, 1.0f, 1.0f);	
 }
 
 void Engine::loop() {
@@ -47,8 +51,7 @@ Engine::Engine(std::string title)
 }
 
 void Engine::render() {
-	glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	
 	world.render(shaders[Shader_Core_Program]);
 

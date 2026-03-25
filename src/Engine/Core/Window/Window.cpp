@@ -93,5 +93,6 @@ void Window::init() {
 void Window::update() {
 	glfwPollEvents();
 	keyboard_control.update();
+    mouse_control.update();
 }
 

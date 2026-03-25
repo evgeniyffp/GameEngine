@@ -1,129 +1,148 @@
 #include "Game.h"
 
+#include <Engine/Easing/PowerEasing.h>
+
+#include <Engine/Animation/MoveAnimation.h>
+#include <Engine/Animation/ColorAnimation.h>
+
+#include <Engine/Graphics/CameraController/BasicCameraController.h>
+#include <Engine/Dron/Dron.h>
+
 #include <Time/Time.h>
 
 #include <utils/displayInfo.h>
 
 void Game::updateCameras() {
-	if (window.getKeyboardControl().isPressedN()) 
-		++selectedCamera;
+	if (getKeyboardControl().isPressedOnce("N")) 
+	++selectedCamera;
 	if (selectedCamera >= cameras.size())
         selectedCamera = 0;
 }
 
 void Game::initUniforms() {
 	updateUniforms();
-	shaders[Shader_Core_Program].setUniformProjectionMatrix(projectionMatrix, "protectionMatrix");
+	shaders[Shader_Core_Program].setUniformProjectionMatrix(projectionMatrix, "projectionMatrix");
 }
 
 void Game::updateUniforms() {
 	shaders[Shader_Core_Program].setUniform_material(materials[0], "material0");
 
-	for (const auto& light : lights) {
-		shaders[Shader_Core_Program].setUniform_light(light, "light0");
+    shaders[Shader_Core_Program].setUniform_1i(lights.size(), "u_lights.count");
+	for (int i = 0; i < lights.size(); ++i) {
+        shaders[Shader_Core_Program].setUniform_light(lights[i], "u_lights.array[" + std::to_string(i) + "]");
 	}
-	shaders[Shader_Core_Program].setUniform_camera(cameras[selectedCamera], "");
+
+	shaders[Shader_Core_Program].setUniform_camera(cameraControllers[selectedCamera]->get(), "");
 }
 
 void Game::updateKeyboardInput() {
-	if (window.getKeyboardControl().isPressedMovementW())
-		cameras[selectedCamera].move_in_direction(Direction::Forward);
-	if (window.getKeyboardControl().isPressedMovementS())
-		cameras[selectedCamera].move_in_direction(Direction::Backward);
+    auto dt = deltaTime::get();
 
-	if (window.getKeyboardControl().isPressedMovementD())
-		cameras[selectedCamera].move_in_direction(Direction::Right);
-	if (window.getKeyboardControl().isPressedMovementA())
-		cameras[selectedCamera].move_in_direction(Direction::Left);
+    std::unordered_map<std::string, Direction> key_to_direction = {
+        { "W", Direction::Forward },
+        { "A", Direction::Left },
+        { "S", Direction::Backward },
+        { "D", Direction::Right },
+        { "LEFT_SHIFT", Direction::Down },
+        { "SPACE", Direction::Up }
+    };
 
-	if (window.getKeyboardControl().isPressedMovementLShift())
-		cameras[selectedCamera].move_in_direction(Direction::Up);
-	if (window.getKeyboardControl().isPressedMovementSpace())
-		cameras[selectedCamera].move_in_direction(Direction::Down);
-
+    for (const auto& [key, direction] : key_to_direction) {
+        if (getKeyboardControl().isPressed(key))
+		    cameraControllers[selectedCamera]->move_in_direction(direction, dt);
+    }
+/*
     vec3 rotation(0.0f);
-	if (glfwGetKey(window.get(), GLFW_KEY_K) == GLFW_PRESS)
+	if (getKeyboardControl().isPressed("K"))
 		rotation.y -= 1.0f;
-	if (glfwGetKey(window.get(), GLFW_KEY_L) == GLFW_PRESS)
+	if (getKeyboardControl().isPressed("L"))
 		rotation.y += 1.0f;
 	world[0].rotate(rotation);
-
-	if (window.getKeyboardControl().isPressedB())
+*/
+	if (getKeyboardControl().isPressedOnce("B"))
 		GLSetting::changeRenderMode();
 	
-    if (window.getKeyboardControl().isPressedEcs())
-        window.close();
+    if (getKeyboardControl().isPressedOnce("ESC"))
+        close();
 }
 
 Game::Game(std::string title) : Engine::Engine(title) {
 	cameras.emplace_back(
 		vec3(0.0f, 0.0f, 0.0f),
-		vec3(0.0f, 1.0f, 0.0f),
-        5
+		vec3(0.0f, 1.0f, 0.0f)
 	);
     cameras.emplace_back(
 		vec3(0.0f, 0.0f, 0.0f),
-		vec3(0.0f, 1.0f, 0.0f),
-        20
+		vec3(0.0f, 1.0f, 0.0f)
 	);
 	cameras.emplace_back(
 		vec3(0.0f, 0.0f, 0.0f),
-		vec3(0.0f, 1.0f, 0.0f),
-        100
+		vec3(0.0f, 1.0f, 0.0f)
 	);
 
+    cameraControllers.push_back(std::make_unique<BasicCameraController>(cameras[0], 10));
+    cameraControllers.push_back(std::make_unique<BasicCameraController>(cameras[1], 50));
+    cameraControllers.push_back(std::make_unique<Dron>(cameras[2], 100));
+
 	shaders.emplace_back("shaders/vertex_core.glsl", "shaders/fragment_core.glsl");
-	lights.emplace_back(vec3(0.0f), 0.5f);
-    
+	// lights.emplace_back(vec3(0.0f), 10.f, vec3(1.0f, 0.0f, 0.0f));
+
     textures.emplace_back("./Files/Images/Brick.png", GL_TEXTURE_2D);
-	materials.emplace_back(vec3(1.0f), vec3(1.0f), vec3(0.0f), true);
+	materials.emplace_back(vec3(1.0f), vec3(1.0f), vec3(0.0f));
 
 	projectionMatrix.update();
 	initModels();
 	initUniforms();
 }
 
-#include <Engine/Animation/MoveAnimation.h>
-
 void Game::initModels() {
 	world.emplace_back(
-		vec3(0.0f, 0.0f, -3.0f),
+		vec3(0.0f, 0.0f, -10.0f),
 		materials[0],
+        // "./Files/Objects/BigCity.obj",
         "./Files/Objects/Monkey.obj",
         textures[0]
     );
 
+/*
     animation_manager.emplace<MoveAnimation>(
         world[0],
-        5.f,
-        std::make_unique<PowerEasing<10>>(),
-        vec3(-10, 0, 0)
+        10.f,
+        std::make_unique<InOutPowerEasing<4>>(),
+        vec3(-70.0, 0, 0),
+        MoveAnimation::Types::Relative
     );
+
+    animation_manager.emplace<ColorAnimation>(
+        materials[0],
+        5.f,
+        std::make_unique<InOutPowerEasing<3>>(),
+        vec3(0.1f, 0.1f, 1.0f),
+        ColorAnimation::Types::Absolute
+    );
+*/
 }
 
 void Game::update() {
-    window.update();
 	deltaTime::update();
+    window.update();
 
     animation_manager.update(deltaTime::get());
     world.update();
 	updateCameras();
 	
-	if (glfwGetMouseButton(window.get(), GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
-		lights[0].setPosition(cameras[selectedCamera].getPosition());
+    glm::vec3 vec(rand(), rand(), rand());
+    vec = glm::normalize(vec);
+
+	if (getMouseControl().isPressedOnce("LEFT"))
+		lights.emplace_back(cameras[selectedCamera].getPosition(), .5f, vec);
+		// lights[0].setPosition(cameras[selectedCamera].getPosition());
     
-    auto& mouse_control = window.getMouseControl();
-    cameras[selectedCamera].update(mouse_control.getOffset());
-	mouse_control.update();
+    cameraControllers[selectedCamera]->update(getMouseControl().getOffset(), deltaTime::get());
 	
     updateKeyboardInput();
 	updateUniforms();
 
     displayInfo(std::to_string(1.0 / deltaTime::get()));
-/*
-	std::cout << cameras[selectedCamera].position.x << ' '
-			  << cameras[selectedCamera].position.y << ' '
-			  << cameras[selectedCamera].position.z << std::endl;
-*/
 }
 

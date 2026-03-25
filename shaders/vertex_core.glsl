@@ -12,7 +12,7 @@ out vec3 vs_normal;
 
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
-uniform mat4 protectionMatrix;
+uniform mat4 projectionMatrix;
 
 void main() {
 	vs_position = vec4(modelMatrix * vec4(vertex_position, 1.0f)).xyz;
@@ -21,6 +21,6 @@ void main() {
 
 	vs_normal = mat3(modelMatrix) * vertex_normal;
 
-	gl_Position = protectionMatrix * viewMatrix * modelMatrix * vec4(vertex_position, 1.0f);
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vertex_position, 1.0f);
 }
 

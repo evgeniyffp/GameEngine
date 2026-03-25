@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 
 #include <glad/glad.h>
 
@@ -8,6 +9,9 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 using namespace glm;
+
+#include <Engine/Graphics/Camera/Camera.h>
+#include <Engine/Graphics/CameraController/CameraController.h>
 
 #include <Engine/Wordl/Wordl.h>
 #include <Engine/Utilities/ProjectionMatrix/ProjectionMatrix.h>
@@ -38,6 +42,7 @@ protected:
 	std::vector<Material> materials;
 
 	std::vector<Camera> cameras;
+	std::vector<std::unique_ptr<CameraController>> cameraControllers;
 
     std::vector<Texture> textures;
 
@@ -47,7 +52,19 @@ public:
 	void loop();
 	
 	Engine(std::string title);
-    ~Engine() = default;
+    virtual ~Engine() = default;
+
+    KeyboardControl& getKeyboardControl() {
+        return window.getKeyboardControl();
+    }
+
+    MouseControl& getMouseControl() {
+        return window.getMouseControl();
+    }
+
+    void close() {
+        window.close();
+    }
 
 	virtual void update() = 0;
 	void render();

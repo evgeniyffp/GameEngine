@@ -51,6 +51,16 @@ void Model::rotate(const vec3& delta_rotation) {
     mesh->rotate(delta_rotation);
 }
 
+vec3 Model::getScale() const {
+    return mesh->getScale();
+}
+void Model::setScale(const vec3& new_scale) {
+    mesh->setScale(new_scale);
+}
+void Model::doScale(const vec3& delta_scale) {
+    mesh->doScale(delta_scale);
+}
+
 void Model::update() {
     mesh->update();
 }

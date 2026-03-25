@@ -129,13 +129,17 @@ void Shader::setUniform_mat4f(mat4 value, std::string name, GLboolean transpose)
 
 void Shader::setUniform_material(const Material& value, std::string name) const {
 	setUniform_vec3f(value.ambient, name + ".ambient");
-	setUniform_vec3f(value.diffuse, name + ".diffuse");
+    setUniform_vec3f(value.diffuse, name + ".diffuse");
 	setUniform_vec3f(value.specular, name + ".specular");
-
-	setUniform_texture(0, name + ".diffuseTex");
-	setUniform_texture(1, name + ".specularTex");
-
-	setUniform_1i(value.useTexture, name + ".useTexture");
+	
+	setUniform_vec3f(value.color, name + ".color");
+    
+    if (value.useTexture) {
+    	setUniform_texture(0, name + ".diffuseTex");
+	    setUniform_texture(1, name + ".specularTex");
+    }
+	
+    setUniform_1i(value.useTexture, name + ".useTexture");
 }
 
 void Shader::setUniform_texture(GLint textureUnit, std::string name) const {

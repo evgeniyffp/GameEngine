@@ -1,0 +1,26 @@
+#pragma once
+
+#include <Engine/Graphics/Camera/Camera.h>
+
+enum class Direction {
+	Forward, Backward,
+	Left, Right,
+	Up, Down
+};
+
+// TODO Movable
+class CameraController {
+protected:
+    Camera& camera;
+	
+public:
+    CameraController(Camera& camera) : camera(camera) {}
+    virtual ~CameraController() = default;
+
+    Camera& get() { return camera; }
+
+	virtual void move_in_direction(const Direction direction, double dt) = 0;
+
+	virtual void update(const glm::dvec2& offset, double dt) = 0;
+};
+

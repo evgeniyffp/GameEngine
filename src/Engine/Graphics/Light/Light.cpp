@@ -24,15 +24,22 @@ Light::Light(
 vec3 Light::getPosition() const {
     return position;
 }
+
 void Light::setPosition(const vec3& new_position) {
     position = new_position;
 }
+
 void Light::move(const vec3& delta_position) {
     position += delta_position;
 }
 
-// TODO
-vec3 Light::getRotation() const { return vec3(0, 0, 0); }
-void Light::setRotation(const vec3& new_rotation) {}
-void Light::rotate(const vec3& delta_position) {}
+glm::vec3 Light::getColor() const {
+    return color;
+}
+void Light::setColor(const glm::vec3& new_color) {
+    color = new_color;
+}
+void Light::doColor(const glm::vec3& delta_color) {
+    color += delta_color;
+}
 

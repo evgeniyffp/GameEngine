@@ -7,7 +7,7 @@
 #include "../Shader/Shader.h"
 #include "../Material/Material.h"
 
-class Model : public Transformable {
+class Model : public Movable, public Rotatable, public Scalable {
 private:
 	const Material& material;
     const Texture& texture;
@@ -40,6 +40,10 @@ public:
     void setRotation(const vec3& new_rotation) override;
     void rotate(const vec3& delta_rotation) override;
  
+    vec3 getScale() const override;
+    void setScale(const vec3& new_scale) override;
+	void doScale(const vec3& delta_scale) override;
+
     void update();
 	void render(const Shader& shader) const;
 };

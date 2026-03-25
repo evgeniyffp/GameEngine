@@ -13,9 +13,11 @@ using namespace glm;
 #include <Engine/Graphics/Shader/Shader.h>
 #include <Engine/Primitives/Primitives.h>
 
-#include <Engine/Graphics/Transformable/Transformable.h>
+#include <Engine/Interfaces/Movable.h>
+#include <Engine/Interfaces/Rotatable.h>
+#include <Engine/Interfaces/Scalable.h>
 
-class Mesh : public Transformable {
+class Mesh : public Movable, public Rotatable, public Scalable {
 private:
     std::vector<Vertex> vertexArray;
 
@@ -65,9 +67,10 @@ public:
 	void setRotation(const vec3& new_rotation) override;
 	void rotate(const vec3& delta_rotation) override;
 
-    vec3 getScale() const;
-    void setScale(const vec3& new_scale);
-	
+    vec3 getScale() const override;
+    void setScale(const vec3& new_scale) override;
+	void doScale(const vec3& delta_scale) override;
+
 	void setOrigin(vec3 origin);
 
     void update();

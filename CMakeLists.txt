@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 
+# set(CMAKE_CXX_FLAGS -fsanitize=address)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -11,30 +13,33 @@ find_package(glm     CONFIG  REQUIRED)
 find_package(spdlog          REQUIRED)
 
 add_executable(${PROJECT_NAME} 
- src/main.cpp
- src/Game/Game.cpp
+    src/main.cpp
+    src/Game/Game.cpp
 
- src/utils/displayInfo.cpp
- src/utils/File.cpp 
+    src/utils/displayInfo.cpp
+    src/utils/File.cpp
 
- src/Time/Time.cpp
- src/Time/TimeFromLastFrame.cpp
+    src/Time/Time.cpp
+    src/Time/TimeFromLastFrame.cpp
 
- src/Engine/Core/Window/Window.cpp   
- src/Engine/Core/Engine.cpp
+    src/Engine/Core/Window/Window.cpp
+    src/Engine/Core/Engine.cpp
 
- src/Engine/Wordl/Wordl.cpp
+    src/Engine/Wordl/Wordl.cpp
 
- src/Engine/Utilities/ObjLoader/ObjLoader.cpp                
- src/Engine/Utilities/ProjectionMatrix/ProjectionMatrix.cpp  
+    src/Engine/Utilities/ObjLoader/ObjLoader.cpp
+    src/Engine/Utilities/ProjectionMatrix/ProjectionMatrix.cpp
 
- src/Engine/Graphics/Camera/Camera.cpp                         
- src/Engine/Graphics/Mesh/Mesh.cpp                            
- src/Engine/Graphics/Shader/Shader.cpp
- src/Engine/Graphics/Model/Model.cpp                          
- src/Engine/Graphics/Texture/Texture.cpp
- src/Engine/Graphics/Light/Light.cpp                           
- src/Engine/Graphics/Material/Material.cpp                     
+    src/Engine/Graphics/Camera/Camera.cpp
+    src/Engine/Graphics/CameraController/BasicCameraController.cpp
+    src/Engine/Dron/Dron.cpp
+ 
+    src/Engine/Graphics/Mesh/Mesh.cpp
+    src/Engine/Graphics/Shader/Shader.cpp
+    src/Engine/Graphics/Model/Model.cpp
+    src/Engine/Graphics/Texture/Texture.cpp
+    src/Engine/Graphics/Light/Light.cpp
+    src/Engine/Graphics/Material/Material.cpp
 )
 
 include_directories(glad/include)

@@ -104,6 +104,9 @@ vec3 Mesh::getScale() const {
 void Mesh::setScale(const vec3& new_scale) {
     scale = new_scale;
 }
+void Mesh::doScale(const vec3& delta_scale) {
+    scale += delta_scale;
+}
 
 void Mesh::setOrigin(vec3 new_origin) { 
     origin = new_origin;

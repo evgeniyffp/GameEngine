@@ -2,21 +2,21 @@
 
 #include <memory>
 
-#include <Engine/Graphics/Transformable/Transformable.h>
 #include <Engine/Easing/Easing.h>
 
 class Animation {
-protected:
-    Transformable& target;
+private:
     float duration;
     float elapsed = 0.0f;
     bool finished = false;
     std::unique_ptr<Easing> easing;
 
 public:
-    Animation(Transformable& target, float duration, std::unique_ptr<Easing> easing)
-        : target(target), duration(duration), easing(std::move(easing)) {}
-    
+    Animation(float duration, std::unique_ptr<Easing> easing)
+        : duration(duration), easing(std::move(easing)) {}
+
+    Animation(Animation&& other) = default;
+
     virtual ~Animation() = default;
 
     void update(float dt) {

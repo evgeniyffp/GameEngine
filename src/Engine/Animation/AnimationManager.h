@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+#include <algorithm>
 
 #include "./Animation.h"
 
@@ -23,10 +24,11 @@ public:
         for (auto& i : animations) {
             i->update(dt);
         }
-        /*
-        // удалить завершённые (можно через std::erase_if)
-        animations.erase(std::remove_if(animations.begin(), animations.end(),
-            [](auto& a) { return a->isFinished(); }), animations.end());
-        */
+    
+        auto l = [](const auto& a) {
+            return a->isFinished(); 
+        };
+
+        animations.erase(std::remove_if(animations.begin(), animations.end(), l), animations.end());
     }
 };
