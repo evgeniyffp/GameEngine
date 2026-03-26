@@ -10,8 +10,7 @@
 using namespace glm;
 
 #include <Engine/Graphics/Vertex/Vertex.h>
-#include <Engine/Graphics/Shader/Shader.h>
-#include <Engine/Primitives/Primitives.h>
+#include <Engine/Shader/Shader.h>
 
 #include <Engine/Interfaces/Movable.h>
 #include <Engine/Interfaces/Rotatable.h>
@@ -46,16 +45,8 @@ public:
 		vec3 rotation = vec3(0.0f), 
 		vec3 scale = vec3(1.0f)
 	);
-/*
-	Mesh(
-		Primitiv* primitive,
-		vec3 position = vec3(0.0f),
-		vec3 origin = vec3(0.0f),
-		vec3 rotation = vec3(0.0f), 
-		vec3 scale = vec3(1.0f)
-	);
-*/	
-	Mesh(const Mesh& object);
+	
+    Mesh(const Mesh& object);
 
 	~Mesh();
 	

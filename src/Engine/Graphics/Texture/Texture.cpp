@@ -4,7 +4,7 @@
 
 #include <soil2/SOIL2.h>
 
-#include <utils/displayInfo.h>
+#include <utils/Log.h>
 
 Texture::Texture() : empty(true) {}
 
@@ -38,10 +38,12 @@ void Texture::loadFromFile(const std::string& imageFile) {
 	glTexParameteri(typeTexture, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
 	std::string info = "Texture.h => Texture::loadFromFile() => SOIL_load_image() => Image \"" + imageFile + "\" load";
-	displayInfo(info);
 	
-    if (!image)
+    if (!image) {
+        Log::error(info);
 		throw info.c_str();
+    }
+    Log::debug(info);
 		
     glTexImage2D(typeTexture, 0, GL_RGBA,
 	    size.x, size.y,

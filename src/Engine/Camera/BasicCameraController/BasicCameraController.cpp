@@ -2,8 +2,6 @@
 
 #include <glm/ext/matrix_transform.hpp>
 
-#include <Time/TimeFromLastFrame.h>
-
 void BasicCameraController::move_in_direction(const Direction direction, double dt) {
     glm::dvec3 delta_position;
     glm::dvec3 front = camera.getFront();

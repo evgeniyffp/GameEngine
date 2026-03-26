@@ -4,7 +4,7 @@
 
 #include "../Mesh/Mesh.h"
 #include "../Texture/Texture.h"
-#include "../Shader/Shader.h"
+#include "../../Shader/Shader.h"
 #include "../Material/Material.h"
 
 class Model : public Movable, public Rotatable, public Scalable {

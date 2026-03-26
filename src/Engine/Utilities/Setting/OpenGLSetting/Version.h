@@ -1,14 +1,13 @@
 #pragma once
 
 namespace GLSetting {
-	class Version
-	{
+	class Version {
 	private:
 		static int GlmajorerVersion;
 		static int GLminorVersion;
+
 	public:
-		static void set(int _GlmajorerVersion, int _GLminorVersion)
-		{
+		static void set(int _GlmajorerVersion, int _GLminorVersion) {
 			GlmajorerVersion = _GlmajorerVersion;
 			GLminorVersion = _GLminorVersion;
 		}

@@ -1,6 +1,6 @@
 #include "./Window.h"
 
-#include <utils/displayInfo.h>
+#include <utils/Log.h>
 
 void framebuffer_resize_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
@@ -10,12 +10,13 @@ void Window::initGLFW() {
     int result = glfwInit();
 
     std::string info = "Window.cpp => Window::initGLFW() => glfwInit() return " + std::to_string(result);
-	displayInfo(info);
 
     if (result != GLFW_TRUE) {
+        Log::critical(info);
 		glfwTerminate();
 		throw info;
 	}
+    Log::debug(info);
 }
 
 void Window::initWindow() {
@@ -27,7 +28,7 @@ void Window::initWindow() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GLSetting::Version::minorVersion());
 	glfwWindowHint(GLFW_RESIZABLE, true);
 
-	size = vec2(mode->width, mode->height);
+	size = glm::vec2(mode->width, mode->height);
 
 	window = glfwCreateWindow(
 		size.x, size.y,
@@ -36,12 +37,13 @@ void Window::initWindow() {
     );
 
 	std::string info = "Window.cpp => initWindow() => create window";
-	displayInfo(info);
 	
     if (window == nullptr) {
+        Log::critical(info);
 		glfwTerminate();
 		throw info;
 	}
+    Log::debug(info);
 
 	glfwMakeContextCurrent(window);
 	
@@ -49,6 +51,8 @@ void Window::initWindow() {
 	glfwGetFramebufferSize(window, &size.x, &size.y);
 	
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    
+    glfwSwapInterval(0); // remove VSycs
 
     keyboard_control.setWindow(window);
     mouse_control.setWindow(window);
@@ -65,7 +69,7 @@ GLFWwindow* Window::get() {
     return window;
 }
 
-ivec2& Window::get_size_ref() {
+glm::ivec2& Window::get_size_ref() {
     return size;
 }
 

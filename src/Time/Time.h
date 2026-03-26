@@ -5,7 +5,7 @@
 namespace Core {
 	class Time {
 	public:
-		// static double get();
+        static void sleep(float seconds);
 
 		static std::string getTimeInfo(const std::string& format = "%Y-%m-%d %H:%M:%S");
 	};

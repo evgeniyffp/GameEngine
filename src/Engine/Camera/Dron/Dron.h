@@ -1,8 +1,7 @@
 #pragma once
 
-#include <Engine/Graphics/CameraController/CameraController.h>
+#include <Engine/Camera/CameraController.h>
 
-// TODO Movable
 class Dron : public CameraController {
 private:
     double movementSpeed;

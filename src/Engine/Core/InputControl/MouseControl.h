@@ -17,9 +17,9 @@ private:
     std::unordered_map<std::string, bool> isPressButton;
     std::unordered_map<std::string, bool> wasPressButton;
 
-    dvec2 lastMouse = { 0.0, 0.0 };
-	dvec2 mouse = { 0.0, 0.0 };
-	dvec2 mouseOffset = { 0.0, 0.0 };
+    glm::dvec2 lastMouse = { 0.0, 0.0 };
+    glm::dvec2 mouse = { 0.0, 0.0 };
+    glm::dvec2 mouseOffset = { 0.0, 0.0 };
 	bool firtsMouse = true;
 
     GLFWwindow* window = nullptr;
@@ -29,7 +29,7 @@ public:
         window = new_window;
     }
 
-    dvec2 getOffset() const {
+    glm::dvec2 getOffset() const {
         return mouseOffset;
     }
 

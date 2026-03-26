@@ -66,13 +66,9 @@ void Model::update() {
 }
 
 void Model::render(const Shader& shader) const {
-	shader.use();
-
 	if (!texture.is_empty())
 		texture.bind(0);
-		
-	mesh->render(shader);
 
-	shader.unUse();
+	mesh->render(shader);
 }
 

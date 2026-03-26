@@ -1,6 +1,4 @@
-#ifndef SETTING_H
-#define SETTING_H
+#pragma once
 
 #include "OpenGLSetting/OpenGLSetting.h"
 
-#endif

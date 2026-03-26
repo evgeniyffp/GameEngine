@@ -1,5 +1,4 @@
-#ifndef OBJ_LOADER_H
-#define OBJ_LOADER_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -15,4 +14,3 @@ public:
 	static std::vector<Vertex> get(std::string fileName);
 };
 
-#endif

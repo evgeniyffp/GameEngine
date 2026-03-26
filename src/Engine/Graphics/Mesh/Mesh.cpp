@@ -1,7 +1,5 @@
 #include "Mesh.h"
 
-#include <utils/displayInfo.h>
-
 void Mesh::initVAO() {
 	glCreateVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
@@ -37,7 +35,9 @@ void Mesh::initVAO() {
 }
 
 void Mesh::uniformsUpdate(const Shader& shader) const {
-	shader.setUniform_mat4f(modelMatrix, "modelMatrix");
+    ShaderUser _su(shader);
+	
+    shader.setUniform(modelMatrix, "modelMatrix");
 }
 
 // be carefull with args (starts with _) and don't confuse them with the variables in the class itself
@@ -50,21 +50,6 @@ Mesh::Mesh(
 	initVAO();
 	update();
 }
-
-/*
-Mesh::Mesh(
-	Primitiv* primitive,
-	vec3 position,
-	vec3 origin, 
-	vec3 rotation,
-	vec3 scale)
-    : Mesh(
-        primitive->vertices,
-	    primitive->indices.data(), (GLuint)primitive->indices.size(),
-	    position, origin, rotation, scale
-    )
-{}
-*/
 
 Mesh::Mesh(const Mesh& object) : Mesh(
 	object.vertexArray, object.indexArray,

@@ -1,43 +1,23 @@
-#include "Game.h"
+#include "./Game.h"
 
-#include <Engine/Easing/PowerEasing.h>
-
+#include <Engine/Animation/Easing/PowerEasing.h>
 #include <Engine/Animation/MoveAnimation.h>
 #include <Engine/Animation/ColorAnimation.h>
 
-#include <Engine/Graphics/CameraController/BasicCameraController.h>
-#include <Engine/Dron/Dron.h>
+#include <Engine/Camera/BasicCameraController/BasicCameraController.h>
+#include <Engine/Camera/Dron/Dron.h>
 
 #include <Time/Time.h>
 
-#include <utils/displayInfo.h>
+#include <utils/Log.h>
 
 void Game::updateCameras() {
 	if (getKeyboardControl().isPressedOnce("N")) 
-	++selectedCamera;
-	if (selectedCamera >= cameras.size())
-        selectedCamera = 0;
+	    ++selectedCameraController;
+	selectedCameraController %= cameraControllers.size();
 }
 
-void Game::initUniforms() {
-	updateUniforms();
-	shaders[Shader_Core_Program].setUniformProjectionMatrix(projectionMatrix, "projectionMatrix");
-}
-
-void Game::updateUniforms() {
-	shaders[Shader_Core_Program].setUniform_material(materials[0], "material0");
-
-    shaders[Shader_Core_Program].setUniform_1i(lights.size(), "u_lights.count");
-	for (int i = 0; i < lights.size(); ++i) {
-        shaders[Shader_Core_Program].setUniform_light(lights[i], "u_lights.array[" + std::to_string(i) + "]");
-	}
-
-	shaders[Shader_Core_Program].setUniform_camera(cameraControllers[selectedCamera]->get(), "");
-}
-
-void Game::updateKeyboardInput() {
-    auto dt = deltaTime::get();
-
+void Game::updateKeyboardInput(float dt) {
     std::unordered_map<std::string, Direction> key_to_direction = {
         { "W", Direction::Forward },
         { "A", Direction::Left },
@@ -49,7 +29,7 @@ void Game::updateKeyboardInput() {
 
     for (const auto& [key, direction] : key_to_direction) {
         if (getKeyboardControl().isPressed(key))
-		    cameraControllers[selectedCamera]->move_in_direction(direction, dt);
+		    cameraControllers[selectedCameraController]->move_in_direction(direction, dt);
     }
 /*
     vec3 rotation(0.0f);
@@ -84,7 +64,7 @@ Game::Game(std::string title) : Engine::Engine(title) {
     cameraControllers.push_back(std::make_unique<BasicCameraController>(cameras[1], 50));
     cameraControllers.push_back(std::make_unique<Dron>(cameras[2], 100));
 
-	shaders.emplace_back("shaders/vertex_core.glsl", "shaders/fragment_core.glsl");
+	addShader("shaders/vertex_core.glsl", "shaders/fragment_core.glsl");
 	// lights.emplace_back(vec3(0.0f), 10.f, vec3(1.0f, 0.0f, 0.0f));
 
     textures.emplace_back("./Files/Images/Brick.png", GL_TEXTURE_2D);
@@ -92,14 +72,13 @@ Game::Game(std::string title) : Engine::Engine(title) {
 
 	projectionMatrix.update();
 	initModels();
-	initUniforms();
 }
 
 void Game::initModels() {
 	world.emplace_back(
 		vec3(0.0f, 0.0f, -10.0f),
 		materials[0],
-        // "./Files/Objects/BigCity.obj",
+        //  "./Files/Objects/BigCity.obj",
         "./Files/Objects/Monkey.obj",
         textures[0]
     );
@@ -123,11 +102,10 @@ void Game::initModels() {
 */
 }
 
-void Game::update() {
-	deltaTime::update();
+void Game::update(float dt) {
     window.update();
 
-    animation_manager.update(deltaTime::get());
+    animation_manager.update(dt);
     world.update();
 	updateCameras();
 	
@@ -135,14 +113,12 @@ void Game::update() {
     vec = glm::normalize(vec);
 
 	if (getMouseControl().isPressedOnce("LEFT"))
-		lights.emplace_back(cameras[selectedCamera].getPosition(), .5f, vec);
-		// lights[0].setPosition(cameras[selectedCamera].getPosition());
-    
-    cameraControllers[selectedCamera]->update(getMouseControl().getOffset(), deltaTime::get());
-	
-    updateKeyboardInput();
-	updateUniforms();
+		lights.emplace_back(cameras[selectedCameraController].getPosition(), .5f, vec);
 
-    displayInfo(std::to_string(1.0 / deltaTime::get()));
+    cameraControllers[selectedCameraController]->update(getMouseControl().getOffset(), dt);
+	
+    updateKeyboardInput(dt);
+
+    Log::info("FPS: {}", 1.0 / dt);
 }
 

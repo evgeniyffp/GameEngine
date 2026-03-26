@@ -1,5 +1,4 @@
-#ifndef RENEDER_MODE_H
-#define RENEDER_MODE_H
+#pragma once
 
 #include <glad/glad.h>
 
@@ -24,4 +23,3 @@ namespace GLSetting {
 	}
 }
 
-#endif

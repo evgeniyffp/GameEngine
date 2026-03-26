@@ -11,15 +11,13 @@ private:
 
 	void updateCameras();
 
-	int selectedCamera = 0;
-
 	void updateMouseInput();
-	void updateKeyboardInput();
+	void updateKeyboardInput(float dt);
 
 public:
 	Game(std::string title);
     ~Game() override = default;
 
-	void update() override;
+	void update(float dt) override;
 };
 

@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include <Engine/Easing/Easing.h>
+#include <Engine/Animation/Easing/Easing.h>
 
 class Animation {
 private:

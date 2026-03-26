@@ -11,9 +11,10 @@
 #include <algorithm>
 
 #include <Engine/Graphics/Vertex/Vertex.h>
-#include <utils/displayInfo.h>
 
-std::map <std::string, std::vector<Vertex>> arrayOfVertex;
+#include <utils/Log.h>
+
+std::map<std::string, std::vector<Vertex>> arrayOfVertex;
 
 std::string ObjectLoader::compile(std::string fileName) {
 	std::ifstream in_file;
@@ -27,11 +28,12 @@ std::string ObjectLoader::compile(std::string fileName) {
 	in_file.open(fileName);
 	
     std::string info = "ObjLoader.cpp => ObjectLoader::compile() => file \"" + fileName + "\" open";
-	displayInfo(info);
 
 	if (!in_file.is_open()) {
+        Log::error(info);
 		throw info;
 	}
+    Log::debug(info);
 
 	while (std::getline(in_file, line)) {
 		ss.clear();
@@ -55,7 +57,7 @@ std::string ObjectLoader::compile(std::string fileName) {
                 }
             }
             else {
-                displayInfo("ObjLoader.cpp => ObjectLoader::compile() >= count of `\\` must be more or equal that 3 (aka " + line + ")");
+                Log::warning("ObjLoader.cpp => ObjectLoader::compile() >= count of `\\` must be more or equal that 3 (aka " + line + ")");
             }
 		}
 
@@ -63,7 +65,7 @@ std::string ObjectLoader::compile(std::string fileName) {
 	}
 	
 	in_file.close();
-    displayInfo("ObjLoader.cpp => ObjectLoader::compile() => file \"" + fileName + "\"compiled succesfull");
+    Log::debug("ObjLoader.cpp => ObjectLoader::compile() => file \"" + fileName + "\" compiled succesfull");
 
 	return file;
 }
@@ -96,7 +98,7 @@ std::vector<Vertex> ObjectLoader::get(std::string fileName)
 
 		std::string info = "ObjLoader.cpp => loadObj() => file open";
 
-		displayInfo(info);
+        Log::debug(info);
 		while (std::getline(file, line))
 		{
 			ss.clear();
@@ -168,7 +170,7 @@ std::vector<Vertex> ObjectLoader::get(std::string fileName)
       }
 			else
 			{
-				displayInfo("[OBJ_LOADER] ObjLoader.cpp => loadObj() => unknown prefix in obj file \'" + prefix + "\'");
+                Log::warning("ObjLoader.cpp => loadObj() => unknown prefix in obj file \'" + prefix + "\'");
 			}
 		}
 		vertices.resize(vertex_position_indicies.size(), Vertex());
@@ -181,10 +183,11 @@ std::vector<Vertex> ObjectLoader::get(std::string fileName)
 			vertices[i].color = vec3(0.5f);
 		}
 
-        displayInfo("ObjLoader.cpp => loadObj() => get " + std::to_string(vertices.size()) + " vertices");
+        Log::debug("ObjLoader.cpp => loadObj() => get " + std::to_string(vertices.size()) + " vertices");
 
 		arrayOfVertex[fileName] = vertices;
 	}
 
 	return arrayOfVertex[fileName];
 }
+

@@ -11,7 +11,7 @@ using namespace glm;
 
 #include <Engine/Graphics/Material/Material.h>
 #include <Engine/Graphics/Light/Light.h>
-#include <Engine/Graphics/Camera/Camera.h>
+#include <Engine/Camera/Camera.h>
 
 #include <Engine/Utilities/Setting/Setting.h>
 #include <Engine/Utilities/ProjectionMatrix/ProjectionMatrix.h>
@@ -34,31 +34,25 @@ public:
 	~Shader();
 
 	GLuint getProgram();
-
-	void use() const;
+	
+    void use() const;
 	void unUse() const;
 
 	void addShader(GLenum typeShader, std::string fileName);
 
 	void linkProgram();
 
-	void setUniform_1i(GLint value, std::string name) const;
-	void setUniform_1f(GLfloat value, std::string name) const;
-	
-	void setUniform_vec2f(vec2 value, std::string name) const;
-	void setUniform_vec3f(vec3 value, std::string name) const;
-	void setUniform_vec4f(vec4 value, std::string name) const;
-
-	void setUniform_mat4f(mat4 value, std::string name, GLboolean transpose = GL_FALSE) const;
-
-	void setUniform_material(const Material& value, std::string name) const;
-
-	void setUniform_texture(GLint textureUnit, std::string name) const;
-
-	void setUniform_light(const Light& value, std::string name) const;
-
-	void setUniform_camera(const Camera& value, std::string name) const;
-
-	void setUniformProjectionMatrix(const ProjectionMatrix& value, std::string name) const;
+    template <typename T>
+    void setUniform(const T& value, std::string name) const;
+    
+    template <typename T>
+    void setUniformArray(const std::vector<T>& vec, std::string name) const {
+        setUniform(vec.size(), name + ".count");
+    	for (int i = 0; i < vec.size(); ++i) {
+            setUniform(vec[i], name + ".array[" + std::to_string(i) + "]");
+	    }
+    }
 };
+
+#include "./ShaderUser.h"
 

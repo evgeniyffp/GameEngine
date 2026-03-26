@@ -2,8 +2,6 @@
 
 #include <glm/ext/matrix_transform.hpp>
 
-#include <Time/TimeFromLastFrame.h>
-
 void Dron::move_in_direction(const Direction direction, double dt) {}
 
 void Dron::updateMouseInput(const glm::dvec2& offset) {

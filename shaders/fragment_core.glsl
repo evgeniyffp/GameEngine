@@ -24,6 +24,10 @@ struct Light {
     float quadratic;
 };
 
+struct Camera {
+    vec3 position;
+};
+
 in vec3 vs_position;
 in vec3 vs_color;
 in vec2 vs_texcoord;
@@ -36,11 +40,11 @@ uniform Material material0;
 #define MAX_LIGHTS 32
 
 uniform struct {
-    int count;
+    uint count;
     Light array[MAX_LIGHTS];
 } u_lights;
 
-uniform vec3 cameraPosition;
+uniform Camera u_camera;
 
 vec3 diffuseLight(Material material, Light light) {
     vec3 posToLightDirVec = normalize(light.position - vs_position);
@@ -52,7 +56,7 @@ vec3 diffuseLight(Material material, Light light) {
 vec3 specularLight(Material material, Light light) {
     vec3 lightToPosDirVec = normalize(vs_position - light.position);
     vec3 reflectDirVec = normalize(reflect(lightToPosDirVec, normalize(vs_normal)));
-    vec3 posToViewDirVec = normalize(cameraPosition - vs_position);
+    vec3 posToViewDirVec = normalize(u_camera.position - vs_position);
     float specularConstant = pow(max(dot(posToViewDirVec, reflectDirVec), 0.0), 32);
     vec3 specularFinal = material.specular * specularConstant;
     
@@ -80,7 +84,7 @@ vec3 calculateLight(Material material, Light light) {
 void main() {
     vec3 lightFinal = vec3(0.0, 0.0, 0.0);
 
-    for (int i = 0; i < u_lights.count; ++i)
+    for (uint i = 0; i < u_lights.count; ++i)
         lightFinal += calculateLight(material0, u_lights.array[i]);
 
     vec3 colorPixel = lightFinal * material0.color;

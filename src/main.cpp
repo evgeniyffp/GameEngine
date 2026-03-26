@@ -1,17 +1,17 @@
 #include "Game/Game.h"
 
-#include <utils/displayInfo.h>
+#include <utils/Log.h>
 
 int main() {
 	try {
+        Log::init();
+
 		Game game("Game Engine");
 	
-        glfwSwapInterval(0); // remove VSycs
-
 		game.loop();
 	}
 	catch (const std::string& error) {
-		displayInfo("EXXEPTION ERROR => " + error);
+	    Log::critical("EXXEPTION ERROR => {}", error);
 	}
 
 	return 0;

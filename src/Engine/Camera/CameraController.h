@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Engine/Graphics/Camera/Camera.h>
+#include <Engine/Camera/Camera.h>
 
 enum class Direction {
 	Forward, Backward,
