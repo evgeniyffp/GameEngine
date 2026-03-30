@@ -24,7 +24,7 @@ void Window::initWindow() {
 	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, GLSetting::Version::majorerVersion());
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, GLSetting::Version::majorVersion());
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GLSetting::Version::minorVersion());
 	glfwWindowHint(GLFW_RESIZABLE, true);
 

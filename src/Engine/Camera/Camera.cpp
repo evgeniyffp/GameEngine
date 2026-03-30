@@ -3,10 +3,10 @@
 #include <glm/ext/matrix_transform.hpp>
 
 void Camera::normalize_rotation() {
-    pitch = glm::clamp(pitch, -80.0, 80.0);
+    pitch = glm::clamp(pitch, -80.f, 80.f);
     
-    while (yaw < 0) yaw += 360.0;
-    while (yaw >= 360.0) yaw -= 360.0;
+    while (yaw < 0.f) yaw += 360.f;
+    while (yaw >= 360.f) yaw -= 360.f;
 }
 
 Camera::Camera(glm::vec3 position, glm::vec3 worldUp) 

@@ -86,6 +86,9 @@ void Engine::loop() {
         for (const auto& name : names) {
             Log::debug("* {}:\t{}ms,\t{}%", name, profiler.get(name) * 1000, profiler.get(name) / dt * 100);
         }
+        
+        vec3 camera_pos = cameraControllers[selectedCameraController]->get().getPosition();
+        Log::debug("Selected camera position - x:{}, y:{}, z:{}", camera_pos.x, camera_pos.y, camera_pos.z);
 
         float addition_time = 1 / FPS - dt;
         if (addition_time > 0.0f) {
@@ -102,6 +105,18 @@ Engine::Engine(std::string title)
 	window.init();
 
     initGLAD();
+}
+
+KeyboardControl& Engine::getKeyboardControl() {
+    return window.getKeyboardControl();
+}
+
+MouseControl& Engine::getMouseControl() {
+    return window.getMouseControl();
+}
+
+void Engine::close() {
+    window.close();
 }
 
 void Engine::render() {

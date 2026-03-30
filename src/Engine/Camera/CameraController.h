@@ -19,8 +19,8 @@ public:
 
     Camera& get() { return camera; }
 
-	virtual void move_in_direction(const Direction direction, double dt) = 0;
+	virtual void move_in_direction(const Direction direction, float dt) = 0;
 
-	virtual void update(const glm::dvec2& offset, double dt) = 0;
+	virtual void update(const glm::vec2& offset, float dt) = 0;
 };
 

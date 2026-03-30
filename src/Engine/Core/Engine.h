@@ -7,11 +7,6 @@
 
 #include <glad/glad.h>
 
-#include <glm/glm.hpp>
-#include <glm/ext/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-using namespace glm;
-
 #include <Engine/Camera/Camera.h>
 #include <Engine/Camera/CameraController.h>
 
@@ -65,17 +60,11 @@ public:
 	Engine(std::string title);
     virtual ~Engine() = default;
 
-    KeyboardControl& getKeyboardControl() {
-        return window.getKeyboardControl();
-    }
+    KeyboardControl& getKeyboardControl();
 
-    MouseControl& getMouseControl() {
-        return window.getMouseControl();
-    }
+    MouseControl& getMouseControl();
 
-    void close() {
-        window.close();
-    }
+    void close();
 
 	virtual void update(float dt) = 0;
 	void render();

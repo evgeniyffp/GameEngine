@@ -30,7 +30,9 @@ private:
 	vec3 origin;
 	vec3 rotation;
 	vec3 scale;
-	mat4 modelMatrix;
+	
+    bool dirty = true;
+    mat4 modelMatrix;
 
 	void initVAO();
 
@@ -46,8 +48,6 @@ public:
 		vec3 scale = vec3(1.0f)
 	);
 	
-    Mesh(const Mesh& object);
-
 	~Mesh();
 	
     vec3 getPosition() const override;

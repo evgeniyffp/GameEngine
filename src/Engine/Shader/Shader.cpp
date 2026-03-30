@@ -161,9 +161,9 @@ void Shader::setUniform(const Light& value, std::string name) const {
 
 template <>
 void Shader::setUniform(const Camera& value, std::string name) const {
-	setUniform(value.viewMatrix, "viewMatrix");
+	setUniform(value.getViewMatrix(), "viewMatrix");
 
-	setUniform(value.position, name + ".position");
+	setUniform(value.getPosition(), name + ".position");
 }
 
 template <>

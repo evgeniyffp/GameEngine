@@ -2,16 +2,16 @@
 
 #include <glm/ext/matrix_transform.hpp>
 
-void Dron::move_in_direction(const Direction direction, double dt) {}
+void Dron::move_in_direction(const Direction direction, float dt) {}
 
-void Dron::updateMouseInput(const glm::dvec2& offset) {
+void Dron::updateMouseInput(const glm::vec2& offset) {
 	camera.rotate(sensitivity * offset);
 }
 
-void Dron::update(const glm::dvec2& offset, double dt) {
+void Dron::update(const glm::vec2& offset, float dt) {
     updateMouseInput(offset + prev_offset);
-	prev_offset += offset * 0.2; prev_offset *= 0.95;
+	prev_offset += offset * 0.2f; prev_offset *= 0.95f;
     camera.update();	
-	camera.move(movementSpeed * dt * glm::dvec3(camera.getFront()));
+	camera.move(movementSpeed * dt * camera.getFront());
 }
 

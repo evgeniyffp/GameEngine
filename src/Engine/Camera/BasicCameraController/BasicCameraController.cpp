@@ -2,10 +2,10 @@
 
 #include <glm/ext/matrix_transform.hpp>
 
-void BasicCameraController::move_in_direction(const Direction direction, double dt) {
-    glm::dvec3 delta_position;
-    glm::dvec3 front = camera.getFront();
-    glm::dvec3 rigth = camera.getRigth();
+void BasicCameraController::move_in_direction(const Direction direction, float dt) {
+    glm::vec3 delta_position{};
+    glm::vec3 front = camera.getFront();
+    glm::vec3 rigth = camera.getRigth();
 
 	switch (direction) {
 	case Direction::Forward:
@@ -41,11 +41,11 @@ void BasicCameraController::move_in_direction(const Direction direction, double 
     camera.move(delta_position);
 }
 
-void BasicCameraController::updateMouseInput(const glm::dvec2& offset) {
+void BasicCameraController::updateMouseInput(const glm::vec2& offset) {
 	camera.rotate(sensitivity * offset);
 }
 
-void BasicCameraController::update(const glm::dvec2& offset, double) {
+void BasicCameraController::update(const glm::vec2& offset, float) {
 	updateMouseInput(offset);
     camera.update();	
 }

@@ -13,7 +13,7 @@ private:
 	vec3 specular;
 
 	bool useTexture;
-    vec3 color; // if useTexture == false
+    vec3 color;
 
 public:
 	friend class Model;

@@ -28,7 +28,7 @@ public:
         const auto& it = times.find(name);
 
         if (it == times.end())
-            return 0;
+            return 0.f;
 
         auto time_interval = it->second;
         return (time_interval.end - time_interval.start) / 1000.f; // convert to second

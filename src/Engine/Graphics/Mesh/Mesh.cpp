@@ -36,7 +36,7 @@ void Mesh::initVAO() {
 
 void Mesh::uniformsUpdate(const Shader& shader) const {
     ShaderUser _su(shader);
-	
+    
     shader.setUniform(modelMatrix, "modelMatrix");
 }
 
@@ -51,11 +51,6 @@ Mesh::Mesh(
 	update();
 }
 
-Mesh::Mesh(const Mesh& object) : Mesh(
-	object.vertexArray, object.indexArray,
-	object.position, object.origin, object.rotation, object.scale
-) {}
-
 Mesh::~Mesh() {
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
@@ -68,9 +63,11 @@ vec3 Mesh::getPosition() const {
 }
 void Mesh::setPosition(const vec3& new_position)  { 
     position = new_position;
+    dirty = true;
 }
 void Mesh::move(const vec3& delta_position)  { 
     position += delta_position;
+    dirty = true;
 }
 
 vec3 Mesh::getRotation() const  {
@@ -78,9 +75,11 @@ vec3 Mesh::getRotation() const  {
 }
 void Mesh::setRotation(const vec3& new_rotation)  {
     rotation = new_rotation;
+    dirty = true;
 }
 void Mesh::rotate(const vec3& delta_rotation)  {
     rotation += delta_rotation;
+    dirty = true;
 }
 
 vec3 Mesh::getScale() const {
@@ -88,16 +87,21 @@ vec3 Mesh::getScale() const {
 }
 void Mesh::setScale(const vec3& new_scale) {
     scale = new_scale;
+    dirty = true;
 }
 void Mesh::doScale(const vec3& delta_scale) {
     scale += delta_scale;
+    dirty = true;
 }
 
 void Mesh::setOrigin(vec3 new_origin) { 
     origin = new_origin;
+    dirty = true;
 }
 
 void Mesh::update() {
+    if (!dirty) return;
+
 	modelMatrix = mat4(1.0f);
 	modelMatrix = translate(modelMatrix, origin);
 	modelMatrix = glm::rotate(modelMatrix, radians(rotation.x), vec3(1.0f, 0.0f, 0.0f));
@@ -105,22 +109,24 @@ void Mesh::update() {
 	modelMatrix = glm::rotate(modelMatrix, radians(rotation.z), vec3(0.0f, 0.0f, 1.0f));
 	modelMatrix = translate(modelMatrix, position - origin);
 	modelMatrix = glm::scale(modelMatrix, scale);
+
+    dirty = false;
 }
 
 void Mesh::render(const Shader& shader) const {
 	uniformsUpdate(shader);
 
-	shader.use();
+    {
+        ShaderUser _su(shader);
 
-	glBindVertexArray(VAO);
-	if (indexArray.size() == 0)
-		glDrawArrays(GL_TRIANGLES, 0, vertexArray.size());
-	else
-		glDrawElements(GL_TRIANGLES, indexArray.size(), GL_UNSIGNED_INT, 0);
+    	glBindVertexArray(VAO);
+    	if (indexArray.size() == 0)
+    		glDrawArrays(GL_TRIANGLES, 0, vertexArray.size());
+    	else
+    		glDrawElements(GL_TRIANGLES, indexArray.size(), GL_UNSIGNED_INT, 0);
 
-	glBindVertexArray(0);
-
-	shader.unUse();
+    	glBindVertexArray(0);
+    }
 
 	glActiveTexture(0);
 	glBindTexture(GL_TEXTURE_2D, 0);

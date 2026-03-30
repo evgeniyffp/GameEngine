@@ -17,14 +17,12 @@ private:
     glm::vec3 up;
     glm::vec3 rigth;
 
-	double pitch;
-	double yaw;
+	float pitch;
+	float yaw;
  
     void normalize_rotation();
 
 public:
-    friend class Shader; // TODO
-    
     Camera(glm::vec3 position, glm::vec3 worldUp); 
     
     void updateCameraVectors();
