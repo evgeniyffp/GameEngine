@@ -10,22 +10,19 @@
 class Model : public Movable, public Rotatable, public Scalable {
 private:
 	const Material& material;
-    const Texture& texture;
     std::unique_ptr<Mesh> mesh;
 
 public:
 	Model(
 		const vec3& position,
 		const Material& material,
-        std::unique_ptr<Mesh> mesh,
-	    const Texture& texture
+        std::unique_ptr<Mesh> mesh
 	);
 
     Model(
 		vec3 position,
 		const Material& material,
-		std::string objectFileName,
-	    const Texture& texture
+		std::string objectFileName
 	);
 
     Model(Model&& other);

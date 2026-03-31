@@ -1,25 +1,35 @@
 #pragma once
 
 #include <glm/vec3.hpp>
-using namespace glm;
+
+#include <Engine/Graphics/Texture/Texture.h>
 
 #include <Engine/Interfaces/Colorable.h>
 
 class Material : public Colorable {
 private:
-	vec3 ambient;
-	
-    vec3 diffuse;
-	vec3 specular;
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
 
-	bool useTexture;
-    vec3 color;
+    glm::vec3 color;
+
+    Texture diffuse_texture;
+    Texture specular_texture;
 
 public:
-	friend class Model;
-	friend class Shader;
+	Material(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, glm::vec3 color = glm::vec3(1.0f));
 
-	Material(vec3 ambient, vec3 diffuse, vec3 specular, vec3 color = vec3(1.0f), bool useTexture = true);
+    void setDiffuseTexture(Texture texture);
+    void setSpecularTexture(Texture texture);
+
+    void bind() const;
+
+    bool isUseTexture() const;
+
+    glm::vec3 getAmbient() const;
+    glm::vec3 getDiffuse() const;
+    glm::vec3 getSpecular() const;
 
     glm::vec3 getColor() const override;
     void setColor(const glm::vec3& new_color) override;

@@ -4,7 +4,6 @@
 
 #include <glad/glad.h>
 #include <glm/vec2.hpp>
-using namespace glm;
 
 constexpr auto TEXTURE_1D = GL_TEXTURE_1D;
 constexpr auto TEXTURE_2D = GL_TEXTURE_2D;
@@ -17,20 +16,22 @@ private:
 
 	GLenum typeTexture;
 
-	ivec2 size;
+    glm::ivec2 size;
 
 public:
     Texture();
 	Texture(const std::string& imageFile, GLenum typeTexture);
 
     Texture(const Texture&) = delete;
+    
+    Texture& operator=(Texture&& texture);
     Texture(Texture&& other);
 
 	~Texture();
 
-    bool is_empty() const { return empty; }
+    bool is_empty() const;
 
-    GLuint get_id() const { return id; }
+    GLuint get_id() const;
 
 	void loadFromFile(const std::string& imageFile);
 

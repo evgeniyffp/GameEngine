@@ -35,7 +35,7 @@ in vec3 vs_normal;
 
 out vec4 fs_color;
 
-uniform Material material0;
+uniform Material material;
 
 #define MAX_LIGHTS 32
 
@@ -61,7 +61,7 @@ vec3 specularLight(Material material, Light light) {
     vec3 specularFinal = material.specular * specularConstant;
     
     if (material.useTexture) {
-        specularFinal *= texture(material0.specularTex, vs_texcoord).rgb;
+        specularFinal *= texture(material.specularTex, vs_texcoord).rgb;
     }
     
     return specularFinal;
@@ -85,12 +85,12 @@ void main() {
     vec3 lightFinal = vec3(0.0, 0.0, 0.0);
 
     for (uint i = 0; i < u_lights.count; ++i)
-        lightFinal += calculateLight(material0, u_lights.array[i]);
+        lightFinal += calculateLight(material, u_lights.array[i]);
 
-    vec3 colorPixel = lightFinal * material0.color;
+    vec3 colorPixel = lightFinal * material.color;
    
-    if (material0.useTexture)
-        colorPixel *= texture(material0.diffuseTex, vs_texcoord).rgb;
+    if (material.useTexture)
+        colorPixel *= texture(material.diffuseTex, vs_texcoord).rgb;
     
     fs_color = vec4(colorPixel, 1.0);
 }

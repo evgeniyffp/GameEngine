@@ -44,8 +44,6 @@ void Engine::initUniforms() {
 void Engine::updateUniforms() {
     ShaderUser _su(shaders[Shader_Core_Program]);
 	
-    shaders[Shader_Core_Program].setUniform(materials[0], "material0");
-
     shaders[Shader_Core_Program].setUniformArray(lights, "u_lights");
 
 	shaders[Shader_Core_Program].setUniform(cameraControllers[selectedCameraController]->get(), "camera");

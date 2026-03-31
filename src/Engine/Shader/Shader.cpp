@@ -133,18 +133,18 @@ void Shader::setUniform(const mat4& value, std::string name) const {
 
 template <>
 void Shader::setUniform(const Material& value, std::string name) const {
-	setUniform(value.ambient, name + ".ambient");
-    setUniform(value.diffuse, name + ".diffuse");
-	setUniform(value.specular, name + ".specular");
+	setUniform(value.getAmbient(), name + ".ambient");
+    setUniform(value.getDiffuse(), name + ".diffuse");
+	setUniform(value.getSpecular(), name + ".specular");
 	
-	setUniform(value.color, name + ".color");
+	setUniform(value.getColor(), name + ".color");
     
-    if (value.useTexture) {
+    setUniform(value.isUseTexture(), name + ".useTexture");
+    
+    if (value.isUseTexture()) {
     	setUniform<GLuint>(0, name + ".diffuseTex");
 	    setUniform<GLuint>(1, name + ".specularTex");
     }
-	
-    setUniform(value.useTexture, name + ".useTexture");
 }
 
 template <>

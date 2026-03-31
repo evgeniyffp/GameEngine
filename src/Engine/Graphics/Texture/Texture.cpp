@@ -12,6 +12,16 @@ Texture::Texture(const std::string& imageFile, GLenum typeTexture) : typeTexture
 	loadFromFile(imageFile);
 }
 
+Texture& Texture::operator=(Texture&& other) {
+    id = std::move(other.id);
+    typeTexture = std::move(other.typeTexture);
+    size = std::move(other.size);
+    
+    empty = false; other.empty = true;
+
+    return *this;
+}
+
 Texture::Texture(Texture&& other) : id(other.id), typeTexture(other.typeTexture), size(other.size)  {
     other.empty = true;
 }
@@ -19,6 +29,14 @@ Texture::Texture(Texture&& other) : id(other.id), typeTexture(other.typeTexture)
 Texture::~Texture() {
     if (!empty)
         glDeleteTextures(1, &id);
+}
+
+bool Texture::is_empty() const { 
+    return empty;
+}
+
+GLuint Texture::get_id() const { 
+    return id; 
 }
 
 void Texture::loadFromFile(const std::string& imageFile) {

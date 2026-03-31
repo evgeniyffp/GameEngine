@@ -5,9 +5,8 @@
 Model::Model(
 	const vec3& position,
 	const Material& material,
-    std::unique_ptr<Mesh> _mesh,
-	const Texture& texture
-) : material(material), texture(texture), mesh(std::move(_mesh))
+    std::unique_ptr<Mesh> _mesh
+) : material(material), mesh(std::move(_mesh))
 {
     mesh->setPosition(position);
     mesh->setOrigin(position);
@@ -16,17 +15,14 @@ Model::Model(
 Model::Model(
 	vec3 position,
 	const Material& material,
-	std::string objectFileName,
-	const Texture& texture
+	std::string objectFileName
 ) : Model(
 		position, material,
-		std::make_unique<Mesh>(ObjectLoader::get(objectFileName)), 
-        texture
+		std::make_unique<Mesh>(ObjectLoader::get(objectFileName))
 ) {}
 
 Model::Model(Model&& other)
         : material(std::move(other.material))
-        , texture(std::move(other.texture))
         , mesh(std::move(other.mesh)) {}
 
 Model::~Model() = default;
@@ -66,8 +62,12 @@ void Model::update() {
 }
 
 void Model::render(const Shader& shader) const {
-	if (!texture.is_empty())
-		texture.bind(0);
+    material.bind();
+
+    {
+        ShaderUser _su(shader);
+        shader.setUniform(material, "material");
+    }
 
 	mesh->render(shader);
 }

@@ -67,8 +67,11 @@ Game::Game(std::string title) : Engine::Engine(title) {
 	addShader("shaders/vertex_core.glsl", "shaders/fragment_core.glsl");
 	// lights.emplace_back(vec3(0.0f), 10.f, vec3(1.0f, 0.0f, 0.0f));
 
-    textures.emplace_back("./Files/Images/Brick.png", GL_TEXTURE_2D);
-	materials.emplace_back(vec3(1.0f), vec3(1.0f), vec3(0.0f));
+    Texture texture("./Files/Images/Brick.png", GL_TEXTURE_2D);
+	Material material(vec3(1.0f), vec3(1.0f), vec3(0.0f));
+    material.setDiffuseTexture(std::move(texture));
+
+    materials.push_back(std::move(material));
 
 	projectionMatrix.update();
 	initModels();
@@ -79,8 +82,7 @@ void Game::initModels() {
 		vec3(0.0f, 0.0f, -10.0f),
 		materials[0],
         //  "./Files/Objects/BigCity.obj",
-        "./Files/Objects/Monkey.obj",
-        textures[0]
+        "./Files/Objects/Monkey.obj"
     );
 
 /*
