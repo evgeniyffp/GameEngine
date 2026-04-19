@@ -72,6 +72,8 @@ void Texture::loadFromFile(const std::string& imageFile) {
 	glBindTexture(typeTexture, id);
 
 	SOIL_free_image_data(image);
+
+    empty = false;
 }
 
 void Texture::bind(const GLint textureUnit) const  {

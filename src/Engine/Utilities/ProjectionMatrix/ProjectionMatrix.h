@@ -14,8 +14,6 @@ private:
     glm::mat4 projectionMatrix;
 
 public:
-	friend class Shader;
-
 	ProjectionMatrix(
 		glm::ivec2& size,
 
@@ -24,6 +22,7 @@ public:
 		float farPlane = 1000
 	);
 
+    glm::mat4 get() const;
 	void update();
 };
 

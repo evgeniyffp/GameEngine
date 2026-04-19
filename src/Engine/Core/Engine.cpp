@@ -1,59 +1,26 @@
 #include "Engine.h"
 
-#include <Engine/Utilities/Setting/Setting.h>
+#include <Engine/ECS/Systems/LightSystem.h>
+#include <Engine/ECS/Systems/CameraSystem.h>
 
 #include <Time/Time.h>
 
+#include <Time/Profiler.h>
+
 #include <utils/Log.h>
 
-void Engine::initGLAD() {
-	if (isInitGLAD)
-        return;
-
-    std::string info = "Engine.cpp => Engine::initGLAD() => gladLoadGLLoader";
-
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        Log::critical(info);
-        glfwTerminate();
-        throw info;
-    }
-
-    Log::debug(info);
-	isInitGLAD = true;
-
-    glEnable(GL_DEPTH_TEST);
-
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glPolygonMode(GL_FRONT_AND_BACK, GLSetting::DefaultRenderMode);
-
-    glClearColor(0.0f, 1.0f, 1.0f, 1.0f);	
-}
-
 void Engine::initUniforms() {
-    ShaderUser _su(shaders[Shader_Core_Program]);
-	
-    shaders[Shader_Core_Program].setUniform(projectionMatrix, "projectionMatrix");
+    ShaderUser _su(*shader);
+
+    shader->setUniform(projectionMatrix, "projectionMatrix");
 }
 
-void Engine::updateUniforms() {
-    ShaderUser _su(shaders[Shader_Core_Program]);
-	
-    shaders[Shader_Core_Program].setUniformArray(lights, "u_lights");
-
-	shaders[Shader_Core_Program].setUniform(cameraControllers[selectedCameraController]->get(), "camera");
-}
-
-void Engine::addShader(const std::string& vertex_filename, const std::string& fragment_filename) {
-	shaders.emplace_back(vertex_filename, fragment_filename);
+void Engine::setShader(const std::string& vertex_filename, const std::string& fragment_filename) {
+	shader = std::make_unique<Shader>(vertex_filename, fragment_filename);
 }
 
 void Engine::loop() {
+	projectionMatrix.update();
     initUniforms();
 
     float dt = 0;
@@ -62,13 +29,21 @@ void Engine::loop() {
         Profiler profiler;
         profiler.start("frame");
 
+        profiler.start("update window");
+        window.update();
+        profiler.end("update window");
+
         profiler.start("update");
         update(dt);
         profiler.end("update");
 		
-        profiler.start("updateUniforms");
-        updateUniforms();
-        profiler.end("updateUniforms");
+        profiler.start("Systems update");
+        LightSystem::update(registry, *shader);
+        CameraSystem::update(registry, active_camera, *shader);
+        
+        auto mouse_offset = getMouseControl().getOffset();
+        CameraSystem::update_mouse_input(registry, active_camera, mouse_offset);
+        profiler.end("Systems update");
 
         profiler.start("render");
         render();
@@ -79,14 +54,24 @@ void Engine::loop() {
         dt = profiler.get("frame");
 
         // profiler info
-        std::vector<std::string> names { "render", "update", "updateUniforms" };
+        std::vector<std::string> names { "render", "update", "update window", "Systems update", "frame" };
+
+        float all_perc = 0.f;
 
         for (const auto& name : names) {
-            Log::debug("* {}:\t{}ms,\t{}%", name, profiler.get(name) * 1000, profiler.get(name) / dt * 100);
-        }
-        
-        vec3 camera_pos = cameraControllers[selectedCameraController]->get().getPosition();
+            float perc = profiler.get(name) / dt * 100;
+            all_perc += perc;
+            Log::debug("* {}:\t{}ms,\t{}%", name, profiler.get(name) * 1000, perc);
+       }
+      
+        const auto& camera = registry.get<CameraComponent>(active_camera);
+
+        glm::vec3 camera_pos = camera.position;
         Log::debug("Selected camera position - x:{}, y:{}, z:{}", camera_pos.x, camera_pos.y, camera_pos.z);
+        
+        Log::debug("Selected camera rotation - x:{}, y:{}", camera.yaw, camera.pitch);
+        
+        Log::info("FPS: {}", 1.0 / dt);
 
         float addition_time = 1 / FPS - dt;
         if (addition_time > 0.0f) {
@@ -98,11 +83,9 @@ void Engine::loop() {
 
 Engine::Engine(std::string title)
         : window(std::move(title)), projectionMatrix(window.get_size_ref()) {
-	GLSetting::Version::set(4, 5);
-
 	window.init();
 
-    initGLAD();
+    renderer.init(glm::vec3(0.f, 1.f, 1.f));
 }
 
 KeyboardControl& Engine::getKeyboardControl() {
@@ -118,16 +101,6 @@ void Engine::close() {
 }
 
 void Engine::render() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	
-	world.render(shaders[Shader_Core_Program]);
-
-	glfwSwapBuffers(window.get());
-	glFlush();
-
-	glBindVertexArray(0);
-
-	glActiveTexture(0);
-	glBindTexture(GL_TEXTURE_2D, 0);
+    renderer.render(window, registry, *shader);
 }
 

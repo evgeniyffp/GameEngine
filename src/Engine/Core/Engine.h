@@ -1,58 +1,35 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 #include <deque>
 
-#include <memory>
+#include <entt/entt.hpp>
 
-#include <glad/glad.h>
-
-#include <Engine/Camera/Camera.h>
-#include <Engine/Camera/CameraController.h>
-
-#include <Engine/Wordl/Wordl.h>
+#include <Engine/Shader/Shader.h>
 #include <Engine/Utilities/ProjectionMatrix/ProjectionMatrix.h>
 
-#include <Engine/Animation/AnimationManager.h>
-
-#include <Time/Profiler.h>
-
 #include "./Window/Window.h"
-
-enum shaderEnum { Shader_Core_Program = 0 };
+#include "./Renderer/Renderer.h"
 
 class Engine {
 private:
-    bool isInitGLAD = false;
-	void initGLAD();
-	
-    std::vector<Shader> shaders;
+    float FPS = 60000.0f;
+    Window window;
 
+    Renderer renderer;
+
+    ProjectionMatrix projectionMatrix;
+    
     void initUniforms();
-    void updateUniforms();
+    
+    std::unique_ptr<Shader> shader;
 
 protected:
-    float FPS = 60.0f;
+    entt::registry registry;
+    entt::entity active_camera;
 
-    Window window;
-	
-	World world;
-
-	ProjectionMatrix projectionMatrix;
-
-	std::vector<Light> lights;
-
-	std::vector<Material> materials;
-	
-    int selectedCameraController = 0;
-	std::deque<Camera> cameras;
-	std::vector<std::unique_ptr<CameraController>> cameraControllers;
-
-    std::vector<Texture> textures;
-
-    AnimationManager animation_manager;
-
-    void addShader(const std::string& vertex_filename, const std::string& fragment_filename);
+    void setShader(const std::string& vertex_filename, const std::string& fragment_filename);
 
 public:
 	void loop();

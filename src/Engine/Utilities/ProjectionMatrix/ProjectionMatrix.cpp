@@ -11,8 +11,11 @@ ProjectionMatrix::ProjectionMatrix(
 ) : size(size), fov(fov), nearPlane(nearPlane), farPlane(farPlane) 
 {}
 
-void ProjectionMatrix::update()
-{
+glm::mat4 ProjectionMatrix::get() const {
+    return projectionMatrix;
+}
+
+void ProjectionMatrix::update() {
     projectionMatrix = glm::mat4(1.0f);
     
     float aspect;

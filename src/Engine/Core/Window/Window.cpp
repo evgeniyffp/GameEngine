@@ -2,7 +2,7 @@
 
 #include <utils/Log.h>
 
-void framebuffer_resize_callback(GLFWwindow* window, int width, int height) {
+void framebuffer_resize_callback(GLFWwindow*, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
@@ -66,6 +66,10 @@ Window::~Window() {
 }
 
 GLFWwindow* Window::get() {
+    return window;
+}
+
+const GLFWwindow* Window::get() const {
     return window;
 }
 

@@ -4,20 +4,15 @@
 
 #include <glad/glad.h>
 
-#include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/ext/matrix_transform.hpp>
-using namespace glm;
 
-#include <Engine/Graphics/Vertex/Vertex.h>
 #include <Engine/Shader/Shader.h>
+#include <Engine/Graphics/Vertex/Vertex.h>
 
-#include <Engine/Interfaces/Movable.h>
-#include <Engine/Interfaces/Rotatable.h>
-#include <Engine/Interfaces/Scalable.h>
-
-class Mesh : public Movable, public Rotatable, public Scalable {
+class Mesh {
 private:
+    bool is_clear = false;
     std::vector<Vertex> vertexArray;
 
     std::vector<GLuint> indexArray;
@@ -26,45 +21,20 @@ private:
 	GLuint VBO;
 	GLuint EBO;
 
-	vec3 position;
-	vec3 origin;
-	vec3 rotation;
-	vec3 scale;
-	
-    bool dirty = true;
-    mat4 modelMatrix;
-
-	void initVAO();
-
-	void uniformsUpdate(const Shader& shader) const;
+	void init();
 
 public:
 	Mesh(
 		std::vector<Vertex> vertices,
-		std::vector<GLuint> indices = {},
-        vec3 position = vec3(0.0f), 
-		vec3 origin = vec3(0.0f),
-		vec3 rotation = vec3(0.0f), 
-		vec3 scale = vec3(1.0f)
+		std::vector<GLuint> indices = {}
 	);
-	
+
+    Mesh(Mesh&& other) : vertexArray(std::move(other.vertexArray)), indexArray(std::move(other.indexArray)), VAO(other.VAO), VBO(other.VBO), EBO(other.EBO) {
+        other.is_clear = true;
+        other.VAO = other.VBO = other.EBO = 0;
+    }
+
 	~Mesh();
-	
-    vec3 getPosition() const override;
-	void setPosition(const vec3& new_position) override;
-	void move(const vec3& delta_position) override;
-
-    vec3 getRotation() const override;
-	void setRotation(const vec3& new_rotation) override;
-	void rotate(const vec3& delta_rotation) override;
-
-    vec3 getScale() const override;
-    void setScale(const vec3& new_scale) override;
-	void doScale(const vec3& delta_scale) override;
-
-	void setOrigin(vec3 origin);
-
-    void update();
 
 	void render(const Shader& shader) const;
 };

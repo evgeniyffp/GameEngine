@@ -28,6 +28,7 @@ public:
 	~Window();
 
     GLFWwindow* get();
+    const GLFWwindow* get() const;
 
     glm::ivec2& get_size_ref();
 

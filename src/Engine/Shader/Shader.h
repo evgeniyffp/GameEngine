@@ -7,14 +7,6 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <glm/gtc/type_ptr.hpp>
-using namespace glm;
-
-#include <Engine/Graphics/Material/Material.h>
-#include <Engine/Graphics/Light/Light.h>
-#include <Engine/Camera/Camera.h>
-
-#include <Engine/Utilities/Setting/Setting.h>
-#include <Engine/Utilities/ProjectionMatrix/ProjectionMatrix.h>
 
 constexpr auto Fragment_Shader = GL_FRAGMENT_SHADER;
 constexpr auto Vertex_Shader = GL_VERTEX_SHADER;
@@ -48,8 +40,8 @@ public:
     template <typename T>
     void setUniformArray(const std::vector<T>& vec, std::string name) const {
         setUniform(vec.size(), name + ".count");
-    	for (int i = 0; i < vec.size(); ++i) {
-            setUniform(vec[i], name + ".array[" + std::to_string(i) + "]");
+    	for (size_t i = 0; i < vec.size(); ++i) {
+            setUniform<T>(vec[i], name + ".array[" + std::to_string(i) + "]");
 	    }
     }
 };

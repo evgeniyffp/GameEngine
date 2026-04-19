@@ -75,7 +75,7 @@ float attenuation(Light light) {
 
 vec3 calculateLight(Material material, Light light) {
     vec3 ambient = material.ambient;
-    vec3 diffuse = diffuseLight(material, light);
+    vec3 diffuse  = diffuseLight(material, light);
     vec3 specular = specularLight(material, light);
     
     return attenuation(light) * light.intensity * light.color * (ambient + diffuse + specular);
@@ -90,7 +90,7 @@ void main() {
     vec3 colorPixel = lightFinal * material.color;
    
     if (material.useTexture)
-        colorPixel *= texture(material.diffuseTex, vs_texcoord).rgb;
+        colorPixel = texture(material.diffuseTex, vs_texcoord).rgb;
     
     fs_color = vec4(colorPixel, 1.0);
 }

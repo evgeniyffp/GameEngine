@@ -5,6 +5,15 @@
 #include <utils/Log.h>
 #include <utils/File.h>
 
+#include <Engine/ECS/Components/CameraComponent.h>
+#include <Engine/ECS/Components/LightComponent.h>
+#include <Engine/ECS/Components/TransformComponent.h>
+
+#include <Engine/Graphics/Material/Material.h>
+
+#include <Engine/Utilities/Setting/Setting.h>
+#include <Engine/Utilities/ProjectionMatrix/ProjectionMatrix.h>
+
 void Shader::createProgram() { 
     id = glCreateProgram();
 }
@@ -112,22 +121,22 @@ void Shader::setUniform(const GLfloat& value, std::string name) const {
 }
 
 template <>
-void Shader::setUniform(const vec2& value, std::string name) const {
+void Shader::setUniform(const glm::vec2& value, std::string name) const {
 	glUniform2fv(glGetUniformLocation(id, name.c_str()), 1, value_ptr(value));
 }
 
 template <>
-void Shader::setUniform(const vec3& value, std::string name) const {
+void Shader::setUniform(const glm::vec3& value, std::string name) const {
 	glUniform3fv(glGetUniformLocation(id, name.c_str()), 1, value_ptr(value));
 }
 
 template <>
-void Shader::setUniform(const vec4& value, std::string name) const {
+void Shader::setUniform(const glm::vec4& value, std::string name) const {
 	glUniform4fv(glGetUniformLocation(id, name.c_str()), 1, value_ptr(value));
 }
 
 template <>
-void Shader::setUniform(const mat4& value, std::string name) const {
+void Shader::setUniform(const glm::mat4& value, std::string name) const {
 	glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, false, value_ptr(value));
 }
 
@@ -148,26 +157,29 @@ void Shader::setUniform(const Material& value, std::string name) const {
 }
 
 template <>
-void Shader::setUniform(const Light& value, std::string name) const {
-	setUniform<GLfloat>(value.intensity, name + ".intensity");
+void Shader::setUniform(const std::pair<TransformComponent, LightComponent>& value, std::string name) const {
+	const auto& transform_component = value.first;
+	const auto& light_component = value.second;
 
-	setUniform<vec3>(value.position, name + ".position");
-	setUniform<vec3>(value.color, name + ".color");
+    setUniform<GLfloat>(light_component.intensity, name + ".intensity");
 
-	setUniform<GLfloat>(value.constant, name + ".constant");
-	setUniform<GLfloat>(value.linear, name + ".linear");
-	setUniform<GLfloat>(value.quadratic, name + ".quadratic");
+	setUniform<glm::vec3>(transform_component.position_component.position, name + ".position");
+	setUniform<glm::vec3>(light_component.color, name + ".color");
+
+	setUniform<GLfloat>(light_component.constant, name + ".constant");
+	setUniform<GLfloat>(light_component.linear, name + ".linear");
+	setUniform<GLfloat>(light_component.quadratic, name + ".quadratic");
 }
 
 template <>
-void Shader::setUniform(const Camera& value, std::string name) const {
-	setUniform(value.getViewMatrix(), "viewMatrix");
+void Shader::setUniform(const CameraComponent& value, std::string name) const {
+	setUniform(value.viewMatrix, "viewMatrix");
 
-	setUniform(value.getPosition(), name + ".position");
+	setUniform(value.position, name + ".position");
 }
 
 template <>
 void Shader::setUniform(const ProjectionMatrix& value, std::string name) const {
-	setUniform(value.projectionMatrix, name);
+	setUniform(value.get(), name);
 }
 
