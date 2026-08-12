@@ -1,8 +1,7 @@
 #include "./RenderSystem.h"
 
 #include <Engine/ECS/Components/TransformComponent.h>
-#include <Engine/ECS/Components/MeshComponent.h>
-#include <Engine/ECS/Components/MaterialComponent.h>
+#include <Engine/ECS/Components/ModelComponent.h>
 
 glm::mat4 calculateModelMatrix(TransformComponent transform_component) {
     using namespace glm;
@@ -25,23 +24,28 @@ glm::mat4 calculateModelMatrix(TransformComponent transform_component) {
 }
 
 void RenderSystem::update(const entt::registry& registry, const Shader& shader) {
-    auto view = registry.view<TransformComponent, MeshComponent, MaterialComponent>();
+    auto view = registry.view<TransformComponent, ModelComponent>();
 
     for (const auto& entity : view) {
         const auto& transform = view.get<TransformComponent>(entity);
-        const auto& mesh = view.get<MeshComponent>(entity).mesh;
-        const auto& material = view.get<MaterialComponent>(entity).material;
-        
-        material.bind();
+        const auto& model = view.get<ModelComponent>(entity);
 
-        {
-            ShaderUser _su(shader);
+        auto absolute_matrix = calculateModelMatrix(transform);
 
-            shader.setUniform(material, "material");
-            shader.setUniform(calculateModelMatrix(transform), "modelMatrix");
+        for (const auto& part : model.parts) {
+            auto final_matrix = absolute_matrix * part.relative_matrix;
+
+            part.material.bind();
+
+            {
+                ShaderUser _su(shader);
+
+                shader.setUniform(part.material, "material");
+                shader.setUniform(final_matrix, "modelMatrix");
+            
+                part.mesh.render();
+            }
         }
-       
-        mesh.render(shader);
     }
 }
 

@@ -1,4 +1,3 @@
-// Engine/Utilities/ModelImporter/ModelImporter.h
 #pragma once
 
 #include <vector>
@@ -12,63 +11,24 @@
 
 #include <Engine/Graphics/Mesh/Mesh.h>
 #include <Engine/Graphics/Material/Material.h>
-#include <Engine/Graphics/Texture/Texture.h>
+
+#include <Engine/ECS/Components/ModelComponent.h>
 
 #include <utils/Log.h>
 
-struct LoadedModel {
-    std::vector<Mesh> meshes;
-    std::vector<Material> materials; // соответствие индексу меша (если у каждого меша свой материал)
-};
+static glm::mat4 toGlmMat4(const aiMatrix4x4& aiMat) {
+    glm::mat4 glmMat;
+    glmMat[0][0] = aiMat.a1; glmMat[1][0] = aiMat.b1; glmMat[2][0] = aiMat.c1; glmMat[3][0] = aiMat.d1;
+    glmMat[0][1] = aiMat.a2; glmMat[1][1] = aiMat.b2; glmMat[2][1] = aiMat.c2; glmMat[3][1] = aiMat.d2;
+    glmMat[0][2] = aiMat.a3; glmMat[1][2] = aiMat.b3; glmMat[2][2] = aiMat.c3; glmMat[3][2] = aiMat.d3;
+    glmMat[0][3] = aiMat.a4; glmMat[1][3] = aiMat.b4; glmMat[2][3] = aiMat.c4; glmMat[3][3] = aiMat.d4;
+    return glmMat;
+}
 
 class ModelImporter {
 public:
-    // Загрузить только меши (без материалов)
-    static std::vector<Mesh> loadMeshes(const std::string& path, bool flipUVs = true) {
-        Assimp::Importer importer;
-        unsigned int flags = aiProcess_Triangulate | aiProcess_GenSmoothNormals |
-                             aiProcess_JoinIdenticalVertices | aiProcess_CalcTangentSpace;
-        if (flipUVs)
-            flags |= aiProcess_FlipUVs;
-
-        const aiScene* scene = importer.ReadFile(path, flags);
-        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-            Log::error("ModelImporter::loadMeshes - Assimp error: {}", importer.GetErrorString());
-            return {};
-        }
-
-        std::vector<Mesh> meshes;
-        processNode(scene->mRootNode, scene, meshes);
-        return meshes;
-    }
-
-    // Загрузить только материалы (без мешей)
-    static std::vector<Material> loadMaterials(const std::string& path, bool flipUVs = true) {
-        Assimp::Importer importer;
-        unsigned int flags = aiProcess_Triangulate | aiProcess_GenSmoothNormals |
-                             aiProcess_JoinIdenticalVertices;
-        if (flipUVs)
-            flags |= aiProcess_FlipUVs;
-
-        const aiScene* scene = importer.ReadFile(path, flags);
-        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-            Log::error("ModelImporter::loadMaterials - Assimp error: {}", importer.GetErrorString());
-            return {};
-        }
-
-        std::vector<Material> materials;
-        // Извлекаем все материалы из сцены (глобальный массив)
-        if (scene->HasMaterials()) {
-            std::string directory = std::filesystem::path(path).parent_path().string();
-            for (unsigned int i = 0; i < scene->mNumMaterials; ++i) {
-                materials.push_back(processMaterial(scene->mMaterials[i], directory));
-            }
-        }
-        return materials;
-    }
-
     // Загрузить всё: меши + материалы, автоматически связывая материалы с мешами
-    static LoadedModel loadFull(const std::string& path, bool flipUVs = true) {
+    static ModelComponent loadFull(const std::string& path, bool flipUVs = true) {
         Assimp::Importer importer;
         unsigned int flags = aiProcess_Triangulate | aiProcess_GenSmoothNormals |
                              aiProcess_JoinIdenticalVertices | aiProcess_CalcTangentSpace;
@@ -80,8 +40,11 @@ public:
             Log::error("ModelImporter::loadFull - Assimp error: {}", importer.GetErrorString());
             return {};
         }
-
-        LoadedModel result;
+        
+        std::vector<Mesh> outMeshes;
+        std::vector<Material> outMaterials;
+        std::vector<glm::mat4> outMatrices;
+                           
         std::string directory = std::filesystem::path(path).parent_path().string();
 
         // Предварительно загружаем все материалы сцены
@@ -93,46 +56,52 @@ public:
         }
 
         // Рекурсивно обходим узлы и создаём меши, привязывая материал по индексу
-        processNodeFull(scene->mRootNode, scene, result.meshes, result.materials, sceneMaterials);
-        return result;
+        processNodeFull(scene->mRootNode, scene, outMeshes, outMaterials, outMatrices, sceneMaterials);
+
+        ModelComponent model;
+
+        model.parts.reserve(outMeshes.size());
+        for (size_t i = 0; i < outMeshes.size(); ++i) {
+            model.parts.push_back({ std::move(outMeshes[i]), std::move(outMaterials[i]), std::move(outMatrices[i]) });
+        }
+
+        return model;
     }
 
 private:
-    // Вспомогательная: обход узлов (только меши, без материалов)
-    static void processNode(aiNode* node, const aiScene* scene, std::vector<Mesh>& meshes) {
-        for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
-            aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-            meshes.push_back(processMesh(mesh, scene));
-        }
-        for (unsigned int i = 0; i < node->mNumChildren; ++i) {
-            processNode(node->mChildren[i], scene, meshes);
-        }
-    }
-
-    // Обход с заполнением мешей и материалов (каждый меш получает копию материала)
     static void processNodeFull(aiNode* node, const aiScene* scene,
-                                std::vector<Mesh>& outMeshes,
-                                std::vector<Material>& outMaterials,
-                                const std::vector<Material>& sceneMaterials) {
+                            std::vector<Mesh>& outMeshes,
+                            std::vector<Material>& outMaterials,
+                            std::vector<glm::mat4>& outMatrices,  // новый вектор для матриц
+                            const std::vector<Material>& sceneMaterials,
+                            const glm::mat4& parentTransform = glm::mat4(1.0f)) {
+        // Вычисляем локальную матрицу узла
+        glm::mat4 nodeLocal = toGlmMat4(node->mTransformation);
+        glm::mat4 accumulated = parentTransform * nodeLocal; // порядок важен: сначала локальная, потом родительская
+
+        // Обрабатываем меши этого узла
         for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
             aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-            outMeshes.push_back(processMesh(mesh, scene));
-            // Привязываем материал, соответствующий индексу mesh->mMaterialIndex
+            outMeshes.push_back(processMesh(mesh));
+            // Материал
             if (mesh->mMaterialIndex < sceneMaterials.size())
                 outMaterials.push_back(sceneMaterials[mesh->mMaterialIndex]);
             else {
-                // fallback материал
                 outMaterials.emplace_back(glm::vec3(0.2f), glm::vec3(0.8f), glm::vec3(0.5f), glm::vec3(1.0f));
                 Log::warning("ModelImporter: mesh has invalid material index {}, using default", mesh->mMaterialIndex);
             }
+            // Сохраняем накопленную матрицу для этого меша
+            outMatrices.push_back(accumulated);
         }
+
+        // Рекурсивно обходим детей
         for (unsigned int i = 0; i < node->mNumChildren; ++i) {
-            processNodeFull(node->mChildren[i], scene, outMeshes, outMaterials, sceneMaterials);
+            processNodeFull(node->mChildren[i], scene, outMeshes, outMaterials, outMatrices, sceneMaterials, accumulated);
         }
     }
 
     // Конвертация aiMesh в Mesh (вершины + индексы)
-    static Mesh processMesh(aiMesh* mesh, const aiScene* scene) {
+    static Mesh processMesh(aiMesh* mesh) {
         std::vector<Vertex> vertices;
         std::vector<GLuint> indices;
 

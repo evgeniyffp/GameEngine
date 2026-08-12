@@ -2,21 +2,27 @@
 
 #include <Engine/Utilities/Setting/Setting.h>
 
+#include <Engine/ECS/Systems/RenderSystem.h>
+
 #include <utils/Log.h>
 
-void Renderer::set_clear_color(const glm::vec3& sky_color) {
+void Renderer::setClearColor(const glm::vec3& sky_color) {
     glClearColor(sky_color.r, sky_color.g, sky_color.b, 1.0f);
 }
 
-void Renderer::begin_frame() const {
+void Renderer::beginFrame() const {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
-void Renderer::draw_scene(const entt::registry& registry, const Shader& shader) const {
-    RenderSystem::update(registry, shader);
+void Renderer::draw(const SceneStorage& scene_storage, const Shader& shader) const {
+    auto cycle = [&](const std::string&, const Scene& scene) {
+        RenderSystem::update(scene.getRegistry(), shader);
+    };
+
+    scene_storage.for_each(cycle);
 }
 
-void Renderer::end_frame(Window& window) const  {
+void Renderer::endFrame(Window& window) const  {
 	glfwSwapBuffers(window.get());
 
 	glBindVertexArray(0);
@@ -48,12 +54,12 @@ void Renderer::init(const glm::vec3& sky_color) {
 
 	glPolygonMode(GL_FRONT_AND_BACK, GLSetting::DefaultRenderMode);
 
-    set_clear_color(sky_color);
+    setClearColor(sky_color);
 }
 
-void Renderer::render(Window& window, const entt::registry& registry, const Shader& shader) const {
-    begin_frame();
-    draw_scene(registry, shader);
-    end_frame(window);
+void Renderer::render(Window& window, const SceneStorage& scene_storage, const Shader& shader) const {
+    beginFrame();
+    draw(scene_storage, shader);
+    endFrame(window);
 }
 

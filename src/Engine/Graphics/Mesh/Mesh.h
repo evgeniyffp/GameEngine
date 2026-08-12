@@ -7,7 +7,6 @@
 #include <glm/mat4x4.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
-#include <Engine/Shader/Shader.h>
 #include <Engine/Graphics/Vertex/Vertex.h>
 
 class Mesh {
@@ -36,6 +35,6 @@ public:
 
 	~Mesh();
 
-	void render(const Shader& shader) const;
+	void render() const;
 };
 

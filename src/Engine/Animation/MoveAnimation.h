@@ -6,7 +6,7 @@
 
 class MoveAnimation : public Animation {
 public:
-    enum class Types {
+    enum class Type {
         Absolute,
         Relative
     };
@@ -26,8 +26,7 @@ private:
     }
 
 public:
-    
-    MoveAnimation(Movable& target, float duration, std::unique_ptr<Easing> easing, vec3 position, Types type)
+    MoveAnimation(Movable& target, float duration, std::unique_ptr<Easing> easing, vec3 position, Type type)
         : Animation(duration, std::move(easing)), target(target)
         , delta_position(calculate_delta_position(position, type)) {}
 

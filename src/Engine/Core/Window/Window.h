@@ -35,7 +35,7 @@ public:
     KeyboardControl& getKeyboardControl();
     MouseControl& getMouseControl();
 
-    bool is_closed();
+    bool isClosed();
     void close();
 
     void init();

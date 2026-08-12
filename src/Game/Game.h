@@ -11,9 +11,6 @@ private:
 
 	void updateCameras();
 
-	void updateMouseInput();
-	void updateKeyboardInput(float dt);
-
 public:
 	Game(std::string title);
     ~Game() override = default;

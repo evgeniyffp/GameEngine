@@ -15,12 +15,12 @@ uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 
 void main() {
-	vs_position = vec4(modelMatrix * vec4(vertex_position, 1.0f)).xyz;
+	vs_position = vec4(modelMatrix * vec4(vertex_position, 1.0)).xyz;
 	vs_color = vertex_color;
-	vs_texcoord = vec2(vertex_texcoord.x, vertex_texcoord.y * -1.0f);
+	vs_texcoord = vertex_texcoord.xy;
 
 	vs_normal = mat3(modelMatrix) * vertex_normal;
 
-	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vertex_position, 1.0f);
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vertex_position, 1.0);
 }
 

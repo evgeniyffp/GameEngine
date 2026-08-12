@@ -6,6 +6,8 @@
 
 #include <glm/vec2.hpp>
 
+#include <utils/Log.h>
+
 class MouseControl {
 private:
     inline static const std::unordered_map<std::string, const int> keymap{
@@ -17,9 +19,9 @@ private:
     std::unordered_map<std::string, bool> isPressButton;
     std::unordered_map<std::string, bool> wasPressButton;
 
-    glm::dvec2 lastMouse = { 0.0, 0.0 };
-    glm::dvec2 mouse = { 0.0, 0.0 };
-    glm::dvec2 mouseOffset = { 0.0, 0.0 };
+    glm::vec2 lastMouse = { 0.0, 0.0 };
+    glm::vec2 mouse = { 0.0, 0.0 };
+    glm::vec2 mouseOffset = { 0.0, 0.0 };
 	bool firtsMouse = true;
 
     GLFWwindow* window = nullptr;
@@ -29,7 +31,7 @@ public:
         window = new_window;
     }
 
-    glm::dvec2 getOffset() const {
+    glm::vec2 getOffset() const {
         return mouseOffset;
     }
 
@@ -37,15 +39,18 @@ public:
 	    wasPressButton = isPressButton;
         for (const auto& [keyname, key] : keymap)
 	        isPressButton[keyname] = (glfwGetMouseButton(window, key) == GLFW_PRESS);
-        
-        glfwGetCursorPos(window, &mouse.x, &mouse.y);
+
+        glm::dvec2 dmouse;   
+        glfwGetCursorPos(window, &dmouse.x, &dmouse.y);
+        mouse = dmouse;
 
     	if (firtsMouse) {
 	    	lastMouse = mouse;
 	    	firtsMouse = false;
 	    }
 
-	    mouseOffset = { mouse.x - lastMouse.x, lastMouse.y - mouse.y };
+	    mouseOffset = mouse - lastMouse;
+        mouseOffset.y *= -1;
 
 	    lastMouse = mouse;
     }

@@ -172,13 +172,6 @@ void Shader::setUniform(const std::pair<TransformComponent, LightComponent>& val
 }
 
 template <>
-void Shader::setUniform(const CameraComponent& value, std::string name) const {
-	setUniform(value.viewMatrix, "viewMatrix");
-
-	setUniform(value.position, name + ".position");
-}
-
-template <>
 void Shader::setUniform(const ProjectionMatrix& value, std::string name) const {
 	setUniform(value.get(), name);
 }

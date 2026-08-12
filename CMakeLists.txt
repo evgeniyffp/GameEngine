@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 
-set(CMAKE_CXX_FLAGS "-Wextra -Wall -Wno-unused-function -pedantic")
+set(CMAKE_CXX_FLAGS "-Wextra -Wall -Wno-unused-function -pedantic -fdiagnostics-all-candidates")
 
-# set(CMAKE_CXX_FLAGS -fsanitize=address)
+set(CMAKE_CXX g++)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

@@ -89,7 +89,7 @@ void Window::close() {
     glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
-bool Window::is_closed() {
+bool Window::isClosed() {
     return glfwWindowShouldClose(window);
 }
 

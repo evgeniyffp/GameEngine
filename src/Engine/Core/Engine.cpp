@@ -3,6 +3,8 @@
 #include <Engine/ECS/Systems/LightSystem.h>
 #include <Engine/ECS/Systems/CameraSystem.h>
 
+#include <Engine/ECS/Components/TransformComponent.h>
+
 #include <Time/Time.h>
 
 #include <Time/Profiler.h>
@@ -18,71 +20,85 @@ void Engine::initUniforms() {
 void Engine::setShader(const std::string& vertex_filename, const std::string& fragment_filename) {
 	shader = std::make_unique<Shader>(vertex_filename, fragment_filename);
 }
-
+ 
 void Engine::loop() {
 	projectionMatrix.update();
     initUniforms();
 
     float dt = 0;
+    auto& main_registry = main_scene.getRegistry();
 
-	while (!window.is_closed()) {
+	while (!window.isClosed()) {
         Profiler profiler;
-        profiler.start("frame");
 
-        profiler.start("update window");
-        window.update();
-        profiler.end("update window");
+        {
+            Profiler::Node _node(profiler, "frame");
 
-        profiler.start("update");
-        update(dt);
-        profiler.end("update");
-		
-        profiler.start("Systems update");
-        LightSystem::update(registry, *shader);
-        CameraSystem::update(registry, active_camera, *shader);
-        
-        auto mouse_offset = getMouseControl().getOffset();
-        CameraSystem::update_mouse_input(registry, active_camera, mouse_offset);
-        profiler.end("Systems update");
+            {
+                Profiler::Node _node(profiler, "window.update()");
+                window.update();
+            }
 
-        profiler.start("render");
-        render();
-        profiler.end("render");
+            {
+                Profiler::Node _node(profiler, "update()");
+                update(dt);
+            }
 
-        profiler.end("frame");
+            {
+                Profiler::Node _node(profiler, "<all ECS systems \\ RenderSystem>::update(...)");
+                
+                auto f = [&](const std::string&, Scene& scene) {
+                    LightSystem::update(scene.getRegistry(), *shader);
+                };
+                
+                scenes.for_each(f);
+                CameraSystem::update(main_registry, active_camera, *shader);
+            }
+
+            {
+                Profiler::Node _node(profiler, "render()");
+                render();
+            }
+
+            {
+                Profiler::Node _node(profiler, "sleep time");
+                
+                profiler.end("frame");
+                dt = profiler.get("frame");
+
+                float addition_time = 1 / FPS - dt;
+                if (addition_time > 0.0f) {
+                    Core::Time::sleep(addition_time);
+                }
+            }
+                profiler.end("frame");
+        }
 
         dt = profiler.get("frame");
 
-        // profiler info
-        std::vector<std::string> names { "render", "update", "update window", "Systems update", "frame" };
+        auto& data = profiler.get();
 
-        float all_perc = 0.f;
-
-        for (const auto& name : names) {
-            float perc = profiler.get(name) / dt * 100;
-            all_perc += perc;
-            Log::debug("* {}:\t{}ms,\t{}%", name, profiler.get(name) * 1000, perc);
+        Log::debug("{}", profiler.get(""));
+        for (auto&& [name, time_interval] : data) {
+            float elapsed = time_interval.elapsed_seconds();
+            float perc = elapsed / dt * 100;
+            Log::debug("* {}:\t{}ms,\t{}%", name, elapsed * 1000, perc);
        }
-      
-        const auto& camera = registry.get<CameraComponent>(active_camera);
 
-        glm::vec3 camera_pos = camera.position;
+        const auto& camera = main_registry.get<CameraComponent>(active_camera);
+
+        glm::vec3 camera_pos = main_registry.get<TransformComponent>(active_camera).position_component.position;
         Log::debug("Selected camera position - x:{}, y:{}, z:{}", camera_pos.x, camera_pos.y, camera_pos.z);
-        
-        Log::debug("Selected camera rotation - x:{}, y:{}", camera.yaw, camera.pitch);
-        
-        Log::info("FPS: {}", 1.0 / dt);
 
-        float addition_time = 1 / FPS - dt;
-        if (addition_time > 0.0f) {
-            Core::Time::sleep(addition_time);
-            dt = 1 / FPS;
-        }
+        Log::debug("Selected camera rotation - yaw:{}, pitch:{}", camera.yaw, camera.pitch);
+
+        Log::info("FPS: {}", 1.0 / dt);
+        Log::debug("{}", profiler.get(""));
     }
 }
 
 Engine::Engine(std::string title)
-        : window(std::move(title)), projectionMatrix(window.get_size_ref()) {
+        : window(std::move(title)), projectionMatrix(window.get_size_ref()), main_scene(scenes.get("main_scene")) {
 	window.init();
 
     renderer.init(glm::vec3(0.f, 1.f, 1.f));
@@ -101,6 +117,6 @@ void Engine::close() {
 }
 
 void Engine::render() {
-    renderer.render(window, registry, *shader);
+    renderer.render(window, scenes, *shader);
 }
 

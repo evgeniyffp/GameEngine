@@ -48,17 +48,14 @@ Mesh::~Mesh() {
 		glDeleteBuffers(1, &EBO);
 }
 
-void Mesh::render(const Shader& shader) const {
-    {
-        ShaderUser _su(shader);
-        glBindVertexArray(VAO);
-        if (indexArray.size() == 0)
-        	glDrawArrays(GL_TRIANGLES, 0, vertexArray.size());
-        else
-        	glDrawElements(GL_TRIANGLES, indexArray.size(), GL_UNSIGNED_INT, 0);
+void Mesh::render() const {
+    glBindVertexArray(VAO);
+    if (indexArray.size() == 0)
+        glDrawArrays(GL_TRIANGLES, 0, vertexArray.size());
+    else
+        glDrawElements(GL_TRIANGLES, indexArray.size(), GL_UNSIGNED_INT, 0);
 
-        glBindVertexArray(0);
-    }
+    glBindVertexArray(0);
 
 	glActiveTexture(0);
 	glBindTexture(GL_TEXTURE_2D, 0);

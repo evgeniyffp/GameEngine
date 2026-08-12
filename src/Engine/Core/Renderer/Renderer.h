@@ -5,22 +5,23 @@
 #include <entt/entt.hpp>
 
 #include <Engine/Shader/Shader.h>
+
 #include <Engine/Core/Window/Window.h>
-#include <Engine/ECS/Systems/RenderSystem.h>
+#include <Engine/Core/Scene/SceneStorage.h>
 
 class Renderer {
 private:
-    void set_clear_color(const glm::vec3& color);
+    void setClearColor(const glm::vec3& color);
 
-    void begin_frame() const;
+    void beginFrame() const;
 
-    void draw_scene(const entt::registry& registry, const Shader& shader) const;
+    void draw(const SceneStorage& registry, const Shader& shader) const;
 
-    void end_frame(Window& window) const;
+    void endFrame(Window& window) const;
 
 public:
     void init(const glm::vec3& sky_color);
 
-    void render(Window& window, const entt::registry& registry, const Shader& shader) const;
+    void render(Window& window, const SceneStorage& registry, const Shader& shader) const;
 };
 

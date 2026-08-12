@@ -1,5 +1,7 @@
 #pragma once
 
+#include <entt/entt.hpp>
+
 #include <Engine/ECS/Components/TransformComponent.h>
 #include <Engine/ECS/Components/LightComponent.h>
 
